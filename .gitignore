@@ -1,0 +1,7 @@
+# Fichiers d'importation de Godot
+.godot/
+*.import
+
+# Fichiers de configuration utilisateur
+export_preset.cfg
+.mono/
