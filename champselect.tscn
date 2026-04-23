@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://xtw0pmujadh8" path="res://alexis (1).png" id="4_xbcuy"]
 [ext_resource type="Texture2D" uid="uid://dibpbj31y5q21" path="res://ui_design/20240707dragon9SlicesB.png" id="5_n1c5n"]
 [ext_resource type="AudioStream" uid="uid://br8lhpod7e15r" path="res://song/Ouverture Électrique.mp3" id="7_8hhtu"]
+[ext_resource type="Texture2D" uid="uid://bct2i1en2ma5r" path="res://persos/brillon/splash_brillon.png" id="10_ikd4m"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_n1c5n"]
 shader = ExtResource("2_t5b0h")
@@ -362,13 +363,34 @@ theme_override_font_sizes/font_size = 20
 autowrap_mode = 1
 text_overrun_behavior = 1
 
-[node name="TextureButton3" type="Button" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions" unique_id=1690409308 groups=["slots_persos"]]
+[node name="Brillon" type="Control" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions" unique_id=256092419]
 custom_minimum_size = Vector2(200, 100)
 layout_mode = 2
+
+[node name="brillon" type="Button" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Brillon" unique_id=1690409308 groups=["slots_persos"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 100.0
 size_flags_horizontal = 4
 size_flags_vertical = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_2k0yc")
+icon = ExtResource("10_ikd4m")
 expand_icon = true
+
+[node name="Label" type="Label" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Brillon" unique_id=256109042]
+clip_contents = true
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 0
+offset_left = 110.0
+offset_top = 40.0
+offset_right = 210.0
+offset_bottom = 90.0
+theme_override_fonts/font = ExtResource("2_8r3tq")
+theme_override_font_sizes/font_size = 20
+autowrap_mode = 1
+text_overrun_behavior = 1
 
 [node name="TextureButton4" type="Button" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions" unique_id=2121977952 groups=["slots_persos"]]
 custom_minimum_size = Vector2(200, 100)

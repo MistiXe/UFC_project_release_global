@@ -169,9 +169,9 @@ func _on_champion_hold_start(bouton):
 		
 		# On remplit le texte
 		var texte = "[center][b][font_size=30]" + nom.to_upper() + "[/font_size][/b][/center]\n"
-		texte += "[center][color=gray]" + data["type"] + "[/color][/center]\n\n"
-		texte += data["description"] + "\n\n"
-		texte += "[color=yellow]" + data["stats"] + "[/color]"
+		#texte += "[center][color=gray]" + data["type"] + "[/color][/center]\n\n"
+		#texte += data["description"] + "\n\n"
+		#texte += "[color=yellow]" + data["stats"] + "[/color]"
 		
 		%label_info.text = texte
 		

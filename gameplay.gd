@@ -26,8 +26,11 @@ var temps = 180
 var compte_a_rebours = 3
 var shake_intensity : float = 0.0
 var taille_voulue = 0.5
-
-# --- INITIALISATION ---
+var extension_active = false
+var territory_owner : int = 0
+@onready var fond_normal = $VideoStreamPlayer# Ton fond actuel
+# Prépare un Sprite ou un ColorRect noir/violet pour le fond de l'ultime
+var video_territoire = preload("res://persos/brillon/bg_ult_brillon.ogv")# --- INITIALISATION ---
 func _ready():
 	# On fixe le zoom une fois pour toutes pour éviter les décalages
 	
@@ -244,3 +247,33 @@ func _unhandled_input(event):
 	if event is InputEventMouseButton and event.pressed:
 		var objet = get_viewport().gui_get_hovered_control()
 		if objet: print("Ta souris a cliqué sur : ", objet.name)
+
+func activer_extension(lanceur_id):
+	extension_active = true
+	territory_owner = lanceur_id
+	
+	# --- CHANGEMENT DE RESSOURCE VIDÉO ---
+	if has_node("VideoStreamPlayer"):
+		var video_normale = $VideoStreamPlayer.stream # On sauvegarde le fond normal
+		
+		$VideoStreamPlayer.stop() # On arrête la vidéo actuelle
+		$VideoStreamPlayer.stream = video_territoire # On change le fichier
+		$VideoStreamPlayer.play() # On lance la vidéo d'ultime
+		
+		# On peut quand même garder un petit effet de couleur pour le style
+		var tw = create_tween()
+		tw.tween_property($VideoStreamPlayer, "modulate", Color(0.8, 0.6, 1.0, 1.0), 0.5)
+		
+		# --- DURÉE DE 30 SECONDES ---
+		await get_tree().create_timer(30.0).timeout
+		
+		# --- RETOUR À LA NORMALE ---
+		$VideoStreamPlayer.stop()
+		$VideoStreamPlayer.stream = video_normale # On remet la montagne
+		$VideoStreamPlayer.play()
+		
+		var tw_end = create_tween()
+		tw_end.tween_property($VideoStreamPlayer, "modulate", Color(1, 1, 1, 1), 0.5)
+	
+	extension_active = false
+	territory_owner = 0
