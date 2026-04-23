@@ -350,6 +350,7 @@ libraries/ = SubResource("AnimationLibrary_u5d45")
 
 [node name="label_combo" type="Label" parent="." unique_id=821771670]
 unique_name_in_owner = true
+visible = false
 z_index = 10
 custom_minimum_size = Vector2(100, 200)
 offset_left = 230.0

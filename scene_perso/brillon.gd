@@ -36,7 +36,7 @@ func _ready():
 func appliquer_cote_initial():
 	if player_id == 2:
 		sprite.flip_h = true
-		$HitboxPoing.position.x = -580
+		$HitboxPoing.position.x = -980
 	else:
 		sprite.flip_h = false
 		$HitboxPoing.position.x = 80
@@ -115,7 +115,7 @@ func _physics_process(delta):
 	if direction != 0:
 		velocity.x = direction * SPEED
 		sprite.flip_h = (direction < 0)
-		$HitboxPoing.position.x = -580 if sprite.flip_h else 80
+		$HitboxPoing.position.x = -980 if sprite.flip_h else 80
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 
