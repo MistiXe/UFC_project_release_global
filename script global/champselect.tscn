@@ -4,12 +4,12 @@
 [ext_resource type="Shader" uid="uid://crprwwbn26vu4" path="res://script global/champselect.gdshader" id="2_ncsgm"]
 [ext_resource type="Texture2D" uid="uid://7l4rlnxy5ll1" path="res://ui_design/bg_v22_no_watermark.png" id="3_t5b0h"]
 [ext_resource type="Texture2D" uid="uid://db8ro3uk7lsox" path="res://ui_design/20240707dragonHeaderA.png" id="4_ikd4m"]
-[ext_resource type="FontFile" uid="uid://dxixa5qwp5b6w" path="res://font/Super Smash TV.ttf" id="5_mv4k2"]
+[ext_resource type="FontFile" uid="uid://dr1on7k76ctm2" path="res://font/Super Smash TV.ttf" id="5_mv4k2"]
 [ext_resource type="Texture2D" uid="uid://dibpbj31y5q21" path="res://ui_design/20240707dragon9SlicesB.png" id="5_n1c5n"]
 [ext_resource type="AudioStream" uid="uid://br8lhpod7e15r" path="res://song/Ouverture Électrique.mp3" id="7_8hhtu"]
 [ext_resource type="Script" uid="uid://dwgg0w1xm4dtr" path="res://script global/grillechampions.gd" id="7_jfns8"]
 [ext_resource type="Texture2D" uid="uid://b1kfpxcdubjad" path="res://persos/hecker_logo.jpg" id="8_vt6da"]
-[ext_resource type="Texture2D" uid="uid://xtw0pmujadh8" path="res://persos/alexisv1.png" id="9_u8q0g"]
+[ext_resource type="Texture2D" uid="uid://fxmshnw7b5us" path="res://persos/alexisv1.png" id="9_u8q0g"]
 [ext_resource type="Texture2D" uid="uid://bct2i1en2ma5r" path="res://persos/brillon/splash_brillon.png" id="10_ikd4m"]
 [ext_resource type="Texture2D" uid="uid://dhai2cm7a0xjt" path="res://persos/garric/garic_splash.png" id="11_h6n8v"]
 
@@ -426,6 +426,30 @@ icon = ExtResource("11_h6n8v")
 expand_icon = true
 
 [node name="Label" type="Label" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Garric" unique_id=248347986]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 0
+offset_left = 110.0
+offset_top = 40.0
+offset_right = 210.0
+offset_bottom = 90.0
+theme_override_fonts/font = ExtResource("5_mv4k2")
+theme_override_font_sizes/font_size = 20
+
+[node name="Garric2" type="Control" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions" unique_id=2064413373]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+
+[node name="garric" type="Button" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Garric2" unique_id=283711189 groups=["slots_persos"]]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 80.0
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_2k0yc")
+expand_icon = true
+
+[node name="Label" type="Label" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Garric2" unique_id=867013250]
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 0
 offset_left = 110.0
