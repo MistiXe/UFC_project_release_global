@@ -1,0 +1,235 @@
+[gd_scene format=3 uid="uid://cb8ycyapdslh0"]
+
+[ext_resource type="Script" uid="uid://bci6lpebfwohq" path="res://menu.gd" id="1_4hy44"]
+[ext_resource type="Shader" uid="uid://2g5w3eg2s0e8" path="res://script global/menu.gdshader" id="2_1bsys"]
+[ext_resource type="Texture2D" uid="uid://7l4rlnxy5ll1" path="res://ui_design/bg_v22_no_watermark.png" id="3_h1wq0"]
+[ext_resource type="Texture2D" uid="uid://bxuemh3gyc16k" path="res://ui_design/ch_b-removebg-preview.png" id="4_iqepy"]
+[ext_resource type="Texture2D" uid="uid://cwl6lstnfp2mw" path="res://ui_design/20240709dragonBarC.png" id="5_dwrpx"]
+[ext_resource type="Texture2D" uid="uid://bvjrsjsf3qkbt" path="res://ui_design/20240709dragonBarB.png" id="6_g7jxm"]
+[ext_resource type="Texture2D" uid="uid://bffa8tiw8v5uw" path="res://ui_design/20240707dragon9SlicesC.png" id="6_nrnbx"]
+[ext_resource type="FontFile" uid="uid://dxixa5qwp5b6w" path="res://font/Super Smash TV.ttf" id="7_1bsys"]
+[ext_resource type="Texture2D" uid="uid://clwn1bsjwc43t" path="res://ui_design/orateur.png" id="7_nrnbx"]
+[ext_resource type="Texture2D" uid="uid://dvg16gx0tcorv" path="res://ui_design/eteindre2.png" id="8_iqepy"]
+[ext_resource type="Texture2D" uid="uid://dr4nyk3nx80gk" path="res://ui_design/20240707dragon9SlicesD.png" id="8_jspdm"]
+[ext_resource type="AudioStream" uid="uid://0e70mrhhvxcn" path="res://song/Début du Kombat.mp3" id="12_1bsys"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_h1wq0"]
+shader = ExtResource("2_1bsys")
+
+[sub_resource type="Animation" id="Animation_8u4n4"]
+length = 0.001
+
+[sub_resource type="Animation" id="Animation_82s3l"]
+resource_name = "fondu"
+length = 0.5
+
+[sub_resource type="Animation" id="Animation_jryq1"]
+resource_name = "lumiere"
+loop_mode = 1
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ytr4m"]
+_data = {
+&"RESET": SubResource("Animation_8u4n4"),
+&"fondu": SubResource("Animation_82s3l"),
+&"lumiere": SubResource("Animation_jryq1")
+}
+
+[node name="Node2D" type="Control" unique_id=1547103146]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4hy44")
+
+[node name="fond_menu" type="TextureRect" parent="." unique_id=2119170654]
+material = SubResource("ShaderMaterial_h1wq0")
+custom_minimum_size = Vector2(1150, 650)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_h1wq0")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=136219932]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="titre_jeu" type="TextureRect" parent="VBoxContainer" unique_id=352327907]
+custom_minimum_size = Vector2(400, 400)
+layout_mode = 2
+size_flags_horizontal = 5
+texture = ExtResource("4_iqepy")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="panneau_bouton_menu" type="Control" parent="VBoxContainer" unique_id=1451060458]
+layout_mode = 2
+size_flags_horizontal = 5
+size_flags_vertical = 3
+
+[node name="buttons_menu" type="VBoxContainer" parent="VBoxContainer/panneau_bouton_menu" unique_id=1262987486]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -99.0
+offset_right = 100.0
+offset_bottom = 99.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="jouer" type="TextureButton" parent="VBoxContainer/panneau_bouton_menu/buttons_menu" unique_id=301463279]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 70)
+layout_mode = 2
+texture_normal = ExtResource("5_dwrpx")
+texture_pressed = ExtResource("6_g7jxm")
+texture_hover = ExtResource("6_g7jxm")
+texture_focused = ExtResource("6_g7jxm")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="texture_jouer" type="Label" parent="VBoxContainer/panneau_bouton_menu/buttons_menu/jouer" unique_id=1392053003]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("7_1bsys")
+theme_override_font_sizes/font_size = 30
+text = "Jouer"
+
+[node name="TextureButton" type="TextureButton" parent="VBoxContainer/panneau_bouton_menu/buttons_menu" unique_id=1642159224]
+custom_minimum_size = Vector2(100, 70)
+layout_mode = 2
+texture_normal = ExtResource("5_dwrpx")
+texture_pressed = ExtResource("6_g7jxm")
+texture_hover = ExtResource("6_g7jxm")
+texture_focused = ExtResource("6_g7jxm")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Tutoriel" type="Label" parent="VBoxContainer/panneau_bouton_menu/buttons_menu/TextureButton" unique_id=232295451]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("7_1bsys")
+theme_override_font_sizes/font_size = 30
+text = "Tutoriel"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/panneau_bouton_menu/buttons_menu" unique_id=940192736]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+alignment = 1
+
+[node name="son" type="TextureButton" parent="VBoxContainer/panneau_bouton_menu/buttons_menu/HBoxContainer" unique_id=1766086698]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+texture_normal = ExtResource("8_jspdm")
+texture_pressed = ExtResource("6_nrnbx")
+texture_hover = ExtResource("6_nrnbx")
+texture_focused = ExtResource("6_nrnbx")
+
+[node name="son2" type="TextureRect" parent="VBoxContainer/panneau_bouton_menu/buttons_menu/HBoxContainer/son" unique_id=991764260]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("7_nrnbx")
+expand_mode = 1
+
+[node name="quitter" type="TextureButton" parent="VBoxContainer/panneau_bouton_menu/buttons_menu/HBoxContainer" unique_id=1954677255]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+texture_normal = ExtResource("8_jspdm")
+texture_pressed = ExtResource("6_nrnbx")
+texture_hover = ExtResource("6_nrnbx")
+texture_focused = ExtResource("6_nrnbx")
+
+[node name="quitter2" type="TextureRect" parent="VBoxContainer/panneau_bouton_menu/buttons_menu/HBoxContainer/quitter" unique_id=1169548047]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_iqepy")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="." unique_id=2011402535]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -99.0
+offset_top = -50.0
+grow_horizontal = 0
+grow_vertical = 0
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("7_1bsys")
+theme_override_font_sizes/font_size = 20
+text = "Version 0.3"
+vertical_alignment = 1
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=570791542]
+stream = ExtResource("12_1bsys")
+autoplay = true
+parameters/looping = true
+
+[node name="fondusortant" type="AnimationPlayer" parent="." unique_id=541651896]
+unique_name_in_owner = true
+libraries/ = SubResource("AnimationLibrary_ytr4m")
+
+[connection signal="pressed" from="VBoxContainer/panneau_bouton_menu/buttons_menu/jouer" to="." method="_on_texture_button_pressed"]

@@ -1,204 +1,171 @@
+
 extends CharacterBody2D
 
 # --- VARIABLES DE BASE ---
-const SPEED = 700.0
-const JUMP_VELOCITY = -1000
+var SPEED = 700.0
+var JUMP_VELOCITY = -1000
 var gravity = 1400.0
-
 var hp_max = 650
 var player_id = 1 
+var ulti_en_cours = false
 
 # --- ÉTATS ---
-var peut_bouger = false 
+var peut_bouger = true # CHANGÉ À TRUE PAR DÉFAUT
 var en_train_dattaquer = false
-var en_parade = false # Actif pendant les 20s de l'ultime
+var en_parade = false 
 var en_blocage = false
 var timer_blocage = 0.0
+
 # --- ASSETS ---
 var icone_ultime = preload("res://persos/hecker/assets_hecker/Vol ancestral.png")
 var splash_ultime = preload("res://persos/hecker/splash_hecker_.png")
 var splash_alexis = preload("res://persos/alexis/splashulti/parade.png")
+var splash_brillon = preload("res://persos/brillon/splash_brillonv1.png")
+var splash_garric = preload("res://persos/garric/garric_real_splash.png")
 @onready var audio_s = AudioStreamPlayer.new()
 var ost_ultime = preload("res://song/Voleur de Sorts_hecker_theme.mp3")
-# --- RÉFÉRENCES ---
 @onready var sprite = $AnimatedSprite2D
 @onready var anim_player = $AnimationPlayer
-var liste_personnages = ["Alexis", "Hecker"]
+var liste_personnages = ["Brillon"]
 
-### Setup ultime
-
-var ultime_vole = null          # Stocke le nom de la fonction à appeler
-var icone_origine = preload("res://persos/hecker/assets_hecker/Vol ancestral.png") # Ton icône de base
-
+var ultime_vole = null          
+var icone_origine = preload("res://persos/hecker/assets_hecker/Vol ancestral.png")
 
 func _ready():
-	if not audio_s.get_parent():
-		add_child(audio_s)
-	# On appelle l'application du côté immédiatement au cas où l'ID est déjà là
+	if not audio_s.get_parent(): add_child(audio_s)
 	appliquer_cote_initial()
 
 func appliquer_cote_initial():
-	if player_id == 2:
-		sprite.flip_h = true
-		# On force la hitbox à GAUCHE
-		$HitboxPoing.position.x = -1080
-		print("Hitbox placée à gauche pour J2")
-	else:
-		sprite.flip_h = false
-		# On force la hitbox à DROITE
-		$HitboxPoing.position.x = 80
-		print("Hitbox placée à droite pour J1")
+	sprite.flip_h = (player_id == 2)
+	_actualiser_hitbox()
+
+func _actualiser_hitbox():
+	if has_node("HitboxPoing"):
+		$HitboxPoing.position.x = -1080 if sprite.flip_h else 80
 
 func _physics_process(delta):
-	# 1. Gestion de la gravité
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	
-	var action_parade = "blocage_" + str(player_id) # Touche 3 ou KP 3
-	
-	if Input.is_action_pressed(action_parade) and is_on_floor() and not en_train_dattaquer:
-		timer_blocage += delta
-		velocity.x = 0 # Immobilisé pendant qu'il se prépare
-		
-		# Feedback visuel : devient de plus en plus sombre/gris en chargeant
-		sprite.modulate = Color(0.5, 0.5, 0.5, 0.5) 
-		
-		if timer_blocage >= 0.5:
-			en_blocage = true
-			sprite.modulate = Color(0.1, 0.1, 0.1, 0.5) # Noir/Gris acier quand le blocage est actif
-	else:
-		# Reset quand on relâche
-		en_blocage = false
-		timer_blocage = 0.0
-		if not en_parade: # Si on n'est pas non plus dans l'ultime d'Alexis
-			sprite.modulate = Color(1, 1, 1, 1)
+	var gameplay = get_parent()
+	var territory_active = gameplay.extension_active and gameplay.territory_owner != player_id
+	var action_parade = "blocage_" + str(player_id)
 
-	# Bloquer le mouvement si on maintient la touche
-	if Input.is_action_pressed(action_parade):
-		move_and_slide()
-		return
-	if anim_player.current_animation == "ultime_hecker":
+	# --- 1. VERROU PESANTEUR (STUN GARRIC) ---
+	if not peut_bouger:
 		velocity.x = 0
-		move_and_slide()
-		return
-
-	# 2. BLOCAGE : Si on fait l'Ulti ou une attaque
-	if not peut_bouger or en_train_dattaquer:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
+		sprite.play("stay")
+		_actualiser_hitbox()
 		move_and_slide()
 		return 
 
-	# 3. Tes Inputs (ON GARDE TOUT ICI)
+	# --- 2. LOGIQUE DE BLOCAGE (TERRITOIRE) ---
+	if territory_active:
+		en_blocage = false
+		if Input.is_action_pressed(action_parade):
+			sprite.modulate = Color(1, 0, 0, 1) 
+		elif not en_parade:
+			sprite.modulate = Color(1, 1, 1, 1)
+	else:
+		if Input.is_action_pressed(action_parade) and is_on_floor() and not en_train_dattaquer:
+			timer_blocage += delta
+			velocity.x = 0
+			sprite.modulate = Color(0.5, 0.5, 0.5, 0.5) 
+			if timer_blocage >= 0.5:
+				en_blocage = true
+				sprite.modulate = Color(0.1, 0.1, 0.1, 0.5)
+		else:
+			en_blocage = false
+			timer_blocage = 0.0
+			if not en_parade: sprite.modulate = Color(1, 1, 1, 1)
+
+	# --- 3. INPUTS & TERRITOIRE ---
 	var move_left = "gauche_" + str(player_id)
 	var move_right = "droite_" + str(player_id)
 	var move_jump = "saut_" + str(player_id)
 	var action_attaque = "attaque_" + str(player_id)
 	var action_ultime = "ultime_" + str(player_id)
-	
-	# 4. Logique de l'Ultime
-	if Input.is_action_just_pressed(action_ultime) and not en_train_dattaquer and is_on_floor():
-		var energie = get_parent().energie_p1 if player_id == 1 else get_parent().energie_p2
-		if energie >= 100:
-			# SI on n'a rien volé : on vole
-			if ultime_vole == null:
-				phase_vol_ancestral()
-			# SI on a déjà quelque chose : on l'utilise !
-			else:
-				utiliser_ultime_vole()
+
+	# SAUT (Inversion territoire)
+	if Input.is_action_just_pressed(move_jump) and is_on_floor():
+		if territory_active:
+			velocity.y = JUMP_VELOCITY * 0.8
+			var recul = 1000.0 if not sprite.flip_h else -1000.0
+			velocity.x = -recul 
+		else:
+			velocity.y = JUMP_VELOCITY
+
+	if Input.is_action_just_pressed(action_ultime):
+		if ultime_vole == null: phase_vol_ancestral()
+		else: utiliser_ultime_vole()
 
 	if Input.is_action_just_pressed(action_attaque):
-		frapper() 
+		frapper()
 
-	# 6. Mouvement standard
-	if Input.is_action_just_pressed(move_jump) and is_on_floor():
-		velocity.y = JUMP_VELOCITY
-
+	# DÉPLACEMENT (Inversion territoire)
 	var direction = Input.get_axis(move_left, move_right)
+	if territory_active:
+		direction = -direction 
+	
 	if direction != 0:
 		velocity.x = direction * SPEED
 		sprite.flip_h = (direction < 0)
-		
-		# On définit la même distance que dans appliquer_cote_initial
-		if sprite.flip_h: # Si regarde à gauche
-			$HitboxPoing.position.x = -1080
-		else: # Si regarde à droite
-			$HitboxPoing.position.x = 80
+		_actualiser_hitbox()
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 
-	# 7. Animations de base
-	if not is_on_floor():
-		sprite.play("jump") 
-	elif direction != 0:
-		sprite.play("walk")
-	else:
-		sprite.play("stay")
+	# --- 4. GESTION DES ANIMATIONS (ANTI-ÉCRASEMENT) ---
+	if not en_train_dattaquer:
+		if not is_on_floor():
+			sprite.play("jump")
+		elif direction != 0:
+			sprite.play("walk")
+		else:
+			sprite.play("stay")
 
 	move_and_slide()
-
-# --- ACTIONS SPÉCIALES ---
-
 func frapper():
 	en_train_dattaquer = true
-	anim_player.play("attaque") # Joue l'anim d'attaque classique
+	anim_player.play("attaque")
 	await anim_player.animation_finished
 	en_train_dattaquer = false
 
 func phase_vol_ancestral():
-	en_train_dattaquer = true
-	sprite.stop()
 	var parent = get_parent()
-	
-	# A. Mise en scène
-	parent.afficher_splashart_ulti(player_id, splash_ultime)
-	await get_tree().create_timer(0.2).timeout
-	parent.zoom_cinematique(self)
-	
-	if anim_player.has_animation("ultime_hecker"):
-		anim_player.play("ultime_hecker")
-		await anim_player.animation_finished
-	
-	# --- B. LE TIRAGE ALÉATOIRE ---
-	var choix_possibles = liste_personnages.duplicate()
-	choix_possibles.erase("Hecker") # On s'enlève de la liste pour ne pas se voler soi-même
-	
-	# On pioche un nom au hasard
-	ultime_vole = choix_possibles[randi() % choix_possibles.size()]
-	
-	# C. On change l'icône selon le résultat
-	# Il faut que tu aies tes icônes prêtes dans tes dossiers
-	if ultime_vole == "Alexis":
-		icone_ultime = preload("res://parade_icon_ultime.png")
-	elif ultime_vole == "Voleur":
-		# icone_ultime = preload("res://...png")
-		pass
+	var energie = parent.energie_p1 if player_id == 1 else parent.energie_p2
+	if energie >= 100:
+		en_train_dattaquer = true
+		parent.afficher_splashart_ulti(player_id, splash_ultime, false) 
+		await get_tree().create_timer(0.2).timeout
+		parent.zoom_cinematique(self)
+		if anim_player.has_animation("ultime_hecker"):
+			anim_player.play("ultime_hecker")
+			await anim_player.animation_finished
+		var choix_possibles = liste_personnages.duplicate()
+		choix_possibles.erase("Hecker")
+		ultime_vole = choix_possibles[randi() % choix_possibles.size()]
 		
-	print("HECKER a généré l'ultime de : ", ultime_vole)
-	parent.mettre_a_jour_ui() # On prévient l'interface
+		# AJOUTE ÇA ICI :
+		if ultime_vole == "Garric":
+			icone_ultime = preload("res://persos/garric/icon_garric_splash.png")
+		elif ultime_vole == "Alexis":
+			icone_ultime = preload("res://persos/parade_icon_ultime.png")
+		elif ultime_vole == "Brillon":
+			icone_ultime = preload("res://persos/brillon/logo_ult_bri2.png")
 
-	# D. Reset (IMPORTANT : Correction du Scale encore !)
-	
-	parent.reset_camera()
-	en_train_dattaquer = false
-
-# --- SIGNAUX ET SETUP ---
+		parent.mettre_a_jour_ui() # Pour que l'icône apparaisse sur la barre
+		parent.reset_camera()
+		en_train_dattaquer = false
 
 func set_player_id(id):
 	player_id = id
-	print("Hecker a reçu son ID : ", id) # Pour vérifier dans la console
-	# On attend que le nœud soit prêt pour manipuler le sprite
-	if not is_node_ready():
-		await ready
+	if not is_node_ready(): await ready
 	appliquer_cote_initial()
 
 func _on_hitbox_poing_area_entered(area):
-	# Si on touche une HurtBox adverse
 	if area.name == "HurtBox":
 		var cible = area.get_parent()
-		if cible != self:
-			print("coucou je te tape")
-			get_parent().infliger_degats(player_id)
-
+		if cible != self: get_parent().infliger_degats(player_id)
 
 func utiliser_ultime_vole():
 	en_train_dattaquer = true
@@ -212,15 +179,18 @@ func utiliser_ultime_vole():
 	# --- DÉCLENCHEMENT DU POUVOIR ---
 	match ultime_vole:
 		"Alexis":
-			icone_ultime = preload("res://parade_icon_ultime.png")
+			icone_ultime = preload("res://persos/parade_icon_ultime.png")
 			print("Icône Alexis chargée !")
 			lancer_pouvoir_alexis_copie()
-		"Samurai":
-			# lancer_pouvoir_samurai_copie()
+		"Brillon":
+			icone_ultime = preload("res://persos/brillon/logo_ult_bri2.png")
+			print("Icône Brillon chargée !")
+			lancer_extension_territoire_copie()
 			pass
-		"Voleur":
-			# lancer_pouvoir_voleur_copie()
-			pass
+		"Garric":
+			icone_ultime = preload("res://persos/garric/icon_garric_splash.png")
+			print("Icône Garric chargée !")
+			lancer_lecon_particuliere_copie()
 
 	# Reset après usage
 	ultime_vole = null
@@ -281,3 +251,94 @@ func lancer_pouvoir_alexis_copie():
 func _on_fin_ultime():
 	en_parade = false
 	sprite.modulate = Color(1, 1, 1, 1) # Retour couleur normale
+
+
+func lancer_extension_territoire_copie():
+	en_train_dattaquer = true
+	var parent = get_parent()
+	
+	# A. On lance le Splash Art de Brillon (true = déclenche l'extension)
+	parent.afficher_splashart_ulti(player_id, splash_brillon, true) 
+	
+	if parent.has_method("gerer_musique_combat"):
+		parent.gerer_musique_combat(false)
+		
+	# B. Attente de la brisure d'écran (coordonné avec le Splash Art)
+	await get_tree().create_timer(2.2).timeout 
+	
+	if not audio_s.get_parent(): 
+		add_child(audio_s)
+	audio_s.stream = ost_ultime # Ou un son de Brillon
+	audio_s.play()
+	
+	# C. On libère Hecker
+	en_train_dattaquer = false
+	
+	# D. RESET : On nettoie le sort volé pour pouvoir revoler plus tard
+	ultime_vole = null
+	icone_ultime = icone_origine
+	parent.mettre_a_jour_ui()
+	
+func lancer_lecon_particuliere_copie():
+	var parent = get_parent()
+	
+	# Désactive la musique de fond
+	if parent.has_method("gerer_musique_combat"):
+		parent.gerer_musique_combat(false)
+	
+	# Utilise le Splash Art de GARRIC (car c'est son sort)
+	parent.afficher_splashart_ulti(player_id, splash_garric, false)
+	
+	await get_tree().create_timer(0.4).timeout
+	parent.zoom_cinematique(self)
+	
+	# Musique de l'ultime
+	audio_s.stream = ost_ultime
+	audio_s.volume_db = -15
+	parent.stopper_tous_les_sons_ultime()
+	audio_s.play()
+
+	# On attend la fin du Splash Art (2.2s au total depuis l'affichage)
+	await get_tree().create_timer(1.8).timeout
+	
+	var cible = parent.get_node("p2") if player_id == 1 else parent.get_node("p1")
+	
+	# SÉCURITÉ VISIBILITÉ : On force tout le monde à être visible avant le TP
+	self.visible = true
+	if is_instance_valid(cible):
+		cible.visible = true
+		
+		# --- DÉBUT DE LA LEÇON ---
+		cible.peut_bouger = false # On fige l'élève
+		cible.velocity = Vector2.ZERO
+		self.velocity = Vector2.ZERO
+		
+		# Téléportation (Hecker se TP derrière l'adversaire)
+		var side = 1.0 if cible.get_node("AnimatedSprite2D").flip_h else -1.0
+		self.global_position = Vector2(cible.global_position.x + (100.0 * side), 580.0)
+		self.z_index = 10
+		sprite.flip_h = cible.get_node("AnimatedSprite2D").flip_h
+		
+		# Effets visuels
+		self.modulate = Color(5, 5, 5, 1) 
+		cible.modulate = Color(1, 0.8, 0.2, 1)
+		
+		if cible.has_method("_actualiser_hitbox"):
+			cible._actualiser_hitbox()
+		
+		# Retour caméra pour voir l'action
+		parent.reset_camera()
+		
+		# Durée de la punition
+		await get_tree().create_timer(4.0).timeout # Réduit à 4s pour Hecker
+		
+		# --- FIN DE LA LEÇON ---
+		if is_instance_valid(cible):
+			cible.peut_bouger = true
+			cible.modulate = Color(1, 1, 1, 1)
+			parent.infliger_degats(player_id)
+			if cible.has_method("_actualiser_hitbox"):
+				cible._actualiser_hitbox()
+		
+		self.modulate = Color(1, 1, 1, 1)
+		print("Hecker a fini sa leçon copiée.")

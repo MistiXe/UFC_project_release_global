@@ -186,7 +186,7 @@ radius = 12.0
 height = 33.926662
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hcnan"]
-radius = 174.94998
+radius = 192.89993
 height = 731.8999
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_llnus"]
@@ -321,6 +321,7 @@ _data = {
 
 [node name="CharacterBody2D" type="CharacterBody2D" unique_id=1987385000]
 scale = Vector2(20, 20)
+collision_mask = 3
 script = ExtResource("1_k7fvt")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=72310354]
@@ -339,7 +340,7 @@ shape = SubResource("CapsuleShape2D_ib0dq")
 [node name="HurtBox" type="Area2D" parent="." unique_id=698961886]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox" unique_id=1205525206]
-position = Vector2(-674.3, -584.45)
+position = Vector2(-608.05, -588.45)
 shape = SubResource("CapsuleShape2D_hcnan")
 
 [node name="HitboxPoing" type="Area2D" parent="." unique_id=1028915382]

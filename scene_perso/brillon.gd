@@ -1,8 +1,8 @@
 extends CharacterBody2D
 
 # --- VARIABLES DE BASE ---
-const SPEED = 600.0
-const JUMP_VELOCITY = -1000
+var SPEED = 600.0
+var JUMP_VELOCITY = -1000
 var gravity = 1400.0
 var combo_count = 0 
 var en_dash = false 
@@ -134,27 +134,26 @@ func _physics_process(delta):
 func lancer_extension_territoire():
 	en_train_dattaquer = true
 	var parent = get_parent()
+	
+	# ON LANCE SEULEMENT LE SPLASH ART (qui lancera l'extension tout seul à la fin)
 	parent.afficher_splashart_ulti(player_id, splash_ultime)
 	
-	# Appel de la fonction dans Gameplay.gd (voir plus bas)
-	parent.activer_extension(player_id)
-	
-	# On coupe la musique de fond
 	if parent.has_method("gerer_musique_combat"):
 		parent.gerer_musique_combat(false)
-	if not audio_s.get_parent():
-		add_child(audio_s)
+		
+	# Musique avec délai (pour coller à la brisure)
+	await get_tree().create_timer(2.2).timeout # On attend la fin du splash art
+	if not audio_s.get_parent(): add_child(audio_s)
 	audio_s.stream = ost_ultime
-	audio_s.volume_db = -15
-	parent.stopper_tous_les_sons_ultime()
-	await get_tree().create_timer(2.0).timeout
 	audio_s.play()
-	# On vide la barre d'énergie
-	var tw = create_tween()
-	if player_id == 1: tw.tween_property(parent, "energie_p1", 0.0, 30.0)
-	else: tw.tween_property(parent, "energie_p2", 0.0, 30.0)
 	
-	await get_tree().create_timer(1.5).timeout # Temps de pose
+	# Vidage de barre
+	var tw = create_tween()
+	var prop = "energie_p1" if player_id == 1 else "energie_p2"
+	tw.tween_property(parent, prop, 0.0, 30.0)
+	
+	# On débloque le perso un peu après la brisure
+	await get_tree().create_timer(1.0).timeout 
 	en_train_dattaquer = false
 
 func frapper():

@@ -443,6 +443,7 @@ _data = {
 }
 
 [node name="CharacterBody2D" type="CharacterBody2D" unique_id=842821425]
+collision_mask = 3
 script = ExtResource("1_ctvbe")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1207473909]
