@@ -31,5 +31,12 @@ var liste_persos = {
 		"description": "",
 		"stats": "",
 		"portrait": "res://persos/garric/garic_splash.png"
-	}
+	},
+	"Montaut": {
+		"scene" : "res://scene_perso/Garric.tscn",
+		"type" : "Defense",
+		"description": "",
+		"stats": "",
+		"portrait": "res://persos/garric/garic_splash.png"
+	},
 }
