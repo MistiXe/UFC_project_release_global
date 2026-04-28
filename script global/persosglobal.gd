@@ -33,10 +33,17 @@ var liste_persos = {
 		"portrait": "res://persos/garric/garic_splash.png"
 	},
 	"Montaut": {
-		"scene" : "res://scene_perso/Garric.tscn",
-		"type" : "Defense",
+		"scene" : "",
+		"type" : "Attaque",
 		"description": "",
 		"stats": "",
 		"portrait": "res://persos/garric/garic_splash.png"
 	},
+	"Pouit": {
+		"scene" : "",
+		"type" : "Attaque",
+		"description": "",
+		"stats": "",
+		"portrait": "res://persos/garric/garic_splash.png"
+	}
 }

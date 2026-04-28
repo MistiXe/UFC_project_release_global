@@ -308,9 +308,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -426.5
-offset_top = -96.0
+offset_top = -100.0
 offset_right = 388.5
-offset_bottom = 87.0
+offset_bottom = 105.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
@@ -435,11 +435,12 @@ offset_bottom = 90.0
 theme_override_fonts/font = ExtResource("5_mv4k2")
 theme_override_font_sizes/font_size = 20
 
-[node name="Garric2" type="Control" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions" unique_id=2064413373]
+[node name="Montaut" type="Control" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions" unique_id=2064413373]
 custom_minimum_size = Vector2(200, 100)
 layout_mode = 2
 
-[node name="garric" type="Button" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Garric2" unique_id=283711189 groups=["slots_persos"]]
+[node name="montaut" type="Button" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Montaut" unique_id=283711189 groups=["slots_persos"]]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 0
 offset_right = 200.0
@@ -449,7 +450,32 @@ size_flags_vertical = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_2k0yc")
 expand_icon = true
 
-[node name="Label" type="Label" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Garric2" unique_id=867013250]
+[node name="Label" type="Label" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Montaut" unique_id=867013250]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 0
+offset_left = 110.0
+offset_top = 40.0
+offset_right = 210.0
+offset_bottom = 90.0
+theme_override_fonts/font = ExtResource("5_mv4k2")
+theme_override_font_sizes/font_size = 20
+
+[node name="Pouit" type="Control" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions" unique_id=1811351932]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+
+[node name="pouit" type="Button" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Pouit" unique_id=1765305553 groups=["slots_persos"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 80.0
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_2k0yc")
+expand_icon = true
+
+[node name="Label" type="Label" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Pouit" unique_id=1039258445]
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 0
 offset_left = 110.0

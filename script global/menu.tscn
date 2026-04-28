@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://cwl6lstnfp2mw" path="res://ui_design/20240709dragonBarC.png" id="5_dwrpx"]
 [ext_resource type="Texture2D" uid="uid://bvjrsjsf3qkbt" path="res://ui_design/20240709dragonBarB.png" id="6_g7jxm"]
 [ext_resource type="Texture2D" uid="uid://bffa8tiw8v5uw" path="res://ui_design/20240707dragon9SlicesC.png" id="6_nrnbx"]
-[ext_resource type="FontFile" uid="uid://dxixa5qwp5b6w" path="res://font/Super Smash TV.ttf" id="7_1bsys"]
+[ext_resource type="FontFile" uid="uid://dr1on7k76ctm2" path="res://font/Super Smash TV.ttf" id="7_1bsys"]
 [ext_resource type="Texture2D" uid="uid://clwn1bsjwc43t" path="res://ui_design/orateur.png" id="7_nrnbx"]
 [ext_resource type="Texture2D" uid="uid://dvg16gx0tcorv" path="res://ui_design/eteindre2.png" id="8_iqepy"]
 [ext_resource type="Texture2D" uid="uid://dr4nyk3nx80gk" path="res://ui_design/20240707dragon9SlicesD.png" id="8_jspdm"]
@@ -220,7 +220,7 @@ grow_vertical = 0
 size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("7_1bsys")
 theme_override_font_sizes/font_size = 20
-text = "Version 0.3"
+text = "Version 0.4"
 vertical_alignment = 1
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=570791542]
