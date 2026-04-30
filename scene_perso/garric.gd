@@ -5,6 +5,7 @@ var SPEED = 550.0
 var JUMP_VELOCITY = -900.0
 var gravity = 1500.0
 var player_id = 1 
+var hp_max = 6500
 
 # --- ÉTATS ---
 var peut_bouger = true 
@@ -114,7 +115,7 @@ func _physics_process(delta):
 		sprite.flip_h = (direction < 0)
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
-
+	
 	# --- 4. GESTION DES ANIMATIONS ---
 	if not en_train_dattaquer:
 		if not is_on_floor():

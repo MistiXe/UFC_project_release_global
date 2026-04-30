@@ -7,7 +7,7 @@ var gravity = 1400.0
 var combo_count = 0 
 var en_dash = false 
 const DASH_FORCE = 2500.0 
-var hp_max = 450
+var hp_max = 1050
 var player_id = 1 
 const DASH_SPEED = 2000.0 
 
@@ -199,7 +199,7 @@ func creer_fantome():
 	ghost.scale = sprite.scale
 	ghost.flip_h = sprite.flip_h
 	ghost.modulate = Color(0.5, 0.7, 1.0, 0.6)
-	ghost.set_script(load("res://ghost_effect.gd")) 
+	ghost.set_script(load("res://script_persos/ghost_effect.gd")) 
 	get_parent().add_child(ghost)
 
 func set_player_id(id):

@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://i5mewqrt5ckd"]
+
+[ext_resource type="Script" uid="uid://c2amhtexllrty" path="res://projectile.gd" id="1_f552m"]
+[ext_resource type="Texture2D" uid="uid://bjvjt73ysrkwo" path="res://ui_design/Water_Effect/01/Water__01.png" id="2_ca18d"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ca18d"]
+radius = 36.05551
+
+[node name="Projectile" type="Area2D" unique_id=73354203]
+script = ExtResource("1_f552m")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=758736382]
+texture = ExtResource("2_ca18d")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=251661574]
+shape = SubResource("CircleShape2D_ca18d")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]

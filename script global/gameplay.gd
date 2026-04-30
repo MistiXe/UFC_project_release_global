@@ -46,8 +46,7 @@ func _ready():
 	
 	
 	
-	bar_p1.max_value = 450
-	bar_p2.max_value = 450
+	
 	mettre_a_jour_ui()
 	demarrer_sequence_intro()
 
@@ -71,34 +70,63 @@ func _process(delta):
 
 # --- GESTION DES JOUEURS ---
 func spawn_joueurs():
-	var p1 = load(Persosglobal.liste_persos[Persosglobal.choix_p1]["scene"]).instantiate()
-	var data_p1 = Persosglobal.liste_persos[Persosglobal.choix_p1]
-	p1.name = "p1"
-	add_child(p1)
-	if data_p1.has("portrait"): portrait_ui_p1.texture = load(data_p1["portrait"])
-	p1.global_position = %spawnJ1.global_position
-	print(p1.global_position)
-	p1.scale = Vector2(taille_voulue, taille_voulue)
-	p1.set_player_id(1)
-	if p1.get("icone_ultime"): icon_ulti_p1.texture = p1.icone_ultime
+	# --- JOUEUR 1 ---
+	var p1_res = Persosglobal.liste_persos[Persosglobal.choix_p1]
+	var p1_instance = load(p1_res["scene"]).instantiate()
+	p1_instance.name = "p1"
+	add_child(p1_instance)
 	
-	var p2 = load(Persosglobal.liste_persos[Persosglobal.choix_p2]["scene"]).instantiate()
-	var data_p2 = Persosglobal.liste_persos[Persosglobal.choix_p2]
-	p2.name = "p2"
-	add_child(p2)
-	if data_p2.has("portrait"): portrait_ui_p2.texture = load(data_p2["portrait"])
-	p2.global_position = %spawnJ2.global_position
-	print(p2.global_position)
-	p2.scale = Vector2(taille_voulue, taille_voulue)
-	p2.set_player_id(2)
-	p2.get_node("AnimatedSprite2D").flip_h = true
-	if p2.get("icone_ultime"): icon_ulti_p2.texture = p2.icone_ultime
+	# Synchronisation des stats et UI pour P1
+	hp_p1 = p1_instance.hp_max # Récupère les 1050 de Garric ou les HP des autres
+	bar_p1.max_value = hp_p1
+	bar_p1.value = hp_p1
+	
+	if p1_res.has("portrait"): 
+		portrait_ui_p1.texture = load(p1_res["portrait"])
+	
+	p1_instance.global_position = %spawnJ1.global_position
+	p1_instance.scale = Vector2(taille_voulue, taille_voulue)
+	p1_instance.set_player_id(1)
+	
+	if p1_instance.get("icone_ultime"): 
+		icon_ulti_p1.texture = p1_instance.icone_ultime
 
-func infliger_degats(frappeur_id):
+	# --- JOUEUR 2 ---
+	var p2_res = Persosglobal.liste_persos[Persosglobal.choix_p2]
+	var p2_instance = load(p2_res["scene"]).instantiate()
+	p2_instance.name = "p2"
+	add_child(p2_instance)
+	
+	# Synchronisation des stats et UI pour P2
+	hp_p2 = p2_instance.hp_max
+	bar_p2.max_value = hp_p2
+	bar_p2.value = hp_p2
+	
+	if p2_res.has("portrait"): 
+		portrait_ui_p2.texture = load(p2_res["portrait"])
+	
+	p2_instance.global_position = %spawnJ2.global_position
+	p2_instance.scale = Vector2(taille_voulue, taille_voulue)
+	p2_instance.set_player_id(2)
+	
+	# On s'assure que le J2 regarde vers la gauche
+	if p2_instance.has_node("AnimatedSprite2D"):
+		p2_instance.get_node("AnimatedSprite2D").flip_h = true
+		
+	if p2_instance.get("icone_ultime"): 
+		icon_ulti_p2.texture = p2_instance.icone_ultime
+
+	# Log de vérification dans la console
+	print("P1 Spawning: ", Persosglobal.choix_p1, " avec ", hp_p1, " HP")
+	print("P2 Spawning: ", Persosglobal.choix_p2, " avec ", hp_p2, " HP")
+
+# On ajoute le paramètre 'donne_energie' qui est vrai (true) par défaut
+func infliger_degats(frappeur_id, donne_energie = true):
 	var degats = 25.0
 	var cible = $p2 if frappeur_id == 1 else $p1
 	var frappeur = $p1 if frappeur_id == 1 else $p2
 	var victime = $p2 if frappeur_id == 1 else $p1
+	
 	if cible.en_blocage:
 		print("BLOCAGE PARFAIT !")
 		shake_intensity = 2.0
@@ -112,16 +140,19 @@ func infliger_degats(frappeur_id):
 		if frappeur_id == 1: hp_p2 -= degats
 		else: hp_p1 -= degats
 		shake_intensity = 15.0
+		
 	if victime.has_method("recevoir_coup_passif"):
-		# Si la victime est Garric, il accumule de l'inertie contre le frappeur
 		victime.recevoir_coup_passif(frappeur)
 	
-	if frappeur_id == 1 and energie_p1 < 100: 
-		energie_p1 = clamp(energie_p1 + 8, 0, 100)
-		if energie_p1 >= 100: feedback_ulti_pret(1)
-	elif frappeur_id == 2 and energie_p2 < 100: 
-		energie_p2 = clamp(energie_p2 + 8, 0, 100)
-		if energie_p2 >= 100: feedback_ulti_pret(2)
+	# --- LOGIQUE D'ÉNERGIE ---
+	# On n'ajoute de l'énergie QUE SI donne_energie est vrai
+	if donne_energie:
+		if frappeur_id == 1 and energie_p1 < 100: 
+			energie_p1 = clamp(energie_p1 + 8, 0, 100)
+			if energie_p1 >= 100: feedback_ulti_pret(1)
+		elif frappeur_id == 2 and energie_p2 < 100: 
+			energie_p2 = clamp(energie_p2 + 8, 0, 100)
+			if energie_p2 >= 100: feedback_ulti_pret(2)
 	
 	mettre_a_jour_ui()
 	verifier_mort()

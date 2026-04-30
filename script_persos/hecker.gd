@@ -8,6 +8,8 @@ var gravity = 1400.0
 var hp_max = 650
 var player_id = 1 
 var ulti_en_cours = false
+var est_en_train_d_aspirer = false
+var cible_ultime = null
 
 # --- ÉTATS ---
 var peut_bouger = true # CHANGÉ À TRUE PAR DÉFAUT
@@ -22,11 +24,16 @@ var splash_ultime = preload("res://persos/hecker/splash_hecker_.png")
 var splash_alexis = preload("res://persos/alexis/splashulti/parade.png")
 var splash_brillon = preload("res://persos/brillon/splash_brillonv1.png")
 var splash_garric = preload("res://persos/garric/garric_real_splash.png")
+var splash_montaut = preload("res://persos/montaut/splash_ult_montautv3.png")
+var splash_pouit = preload("res://persos/pouit/splash_ultv2.png")
 @onready var audio_s = AudioStreamPlayer.new()
 var ost_ultime = preload("res://song/Voleur de Sorts_hecker_theme.mp3")
 @onready var sprite = $AnimatedSprite2D
 @onready var anim_player = $AnimationPlayer
-var liste_personnages = ["Brillon"]
+@export var becane_scene : PackedScene = preload("res://script_persos/becane_objet.tscn") # À charger avec ton fichier moto.tscn
+
+#@onready var particules = $ParticulesGradient
+var liste_personnages = ["Pouit"]
 
 var ultime_vole = null          
 var icone_origine = preload("res://persos/hecker/assets_hecker/Vol ancestral.png")
@@ -122,7 +129,22 @@ func _physics_process(delta):
 			sprite.play("walk")
 		else:
 			sprite.play("stay")
-
+	if est_en_train_d_aspirer and is_instance_valid(cible_ultime):
+		# 1. Calcul du vecteur de direction vers Hecker
+		var direction_gradient = (global_position - cible_ultime.global_position).normalized()
+		
+		# 2. Calcul de la distance
+		var distance = global_position.distance_to(cible_ultime.global_position)
+		
+		# 3. Calcul de la force (le fameux "Gradient")
+		# Plus la cible est loin, plus elle est aspirée fort
+		var force_attraction = clamp(distance * 5.0, 500.0, 3000.0)
+		
+		# 4. On applique la vélocité directement sur la cible
+		cible_ultime.velocity.x = direction_gradient.x * force_attraction
+		
+		# 5. On force la cible à bouger (car son propre physics_process est souvent bloqué par peut_bouger = false)
+		cible_ultime.move_and_slide()
 	move_and_slide()
 func frapper():
 	en_train_dattaquer = true
@@ -152,7 +174,11 @@ func phase_vol_ancestral():
 			icone_ultime = preload("res://persos/parade_icon_ultime.png")
 		elif ultime_vole == "Brillon":
 			icone_ultime = preload("res://persos/brillon/logo_ult_bri2.png")
-
+		elif ultime_vole == "Montaut":
+			icone_ultime = preload("res://persos/montaut/icon_descente.png")	
+		elif ultime_vole == "Pouit":
+			icone_ultime = preload("res://persos/pouit/icon_ult.png")	
+			
 		parent.mettre_a_jour_ui() # Pour que l'icône apparaisse sur la barre
 		parent.reset_camera()
 		en_train_dattaquer = false
@@ -186,11 +212,20 @@ func utiliser_ultime_vole():
 			icone_ultime = preload("res://persos/brillon/logo_ult_bri2.png")
 			print("Icône Brillon chargée !")
 			lancer_extension_territoire_copie()
-			pass
 		"Garric":
 			icone_ultime = preload("res://persos/garric/icon_garric_splash.png")
 			print("Icône Garric chargée !")
 			lancer_lecon_particuliere_copie()
+		"Montaut":
+			icone_ultime = preload("res://persos/montaut/icon_descente.png")
+			print("Icône Montaut chargée !")
+			lancer_descente_gradient_copie()
+		"Pouit":
+			icone_ultime = preload("res://persos/pouit/icon_ult.png")
+			print("Icône Pouit chargée !")
+			lancer_ruee_de_becanes_copie()
+			
+			
 
 	# Reset après usage
 	ultime_vole = null
@@ -342,3 +377,93 @@ func lancer_lecon_particuliere_copie():
 		
 		self.modulate = Color(1, 1, 1, 1)
 		print("Hecker a fini sa leçon copiée.")
+func lancer_descente_gradient_copie():
+	var parent = get_parent()
+	# Lancement Musique
+	if parent.has_method("gerer_musique_combat"):
+		parent.gerer_musique_combat(false)
+	audio_s.stream = ost_ultime
+	audio_s.volume_db = -10
+	audio_s.play()
+	
+	
+	cible_ultime = parent.get_node("p2") if player_id == 1 else parent.get_node("p1")
+	
+	if is_instance_valid(cible_ultime):
+		print("coucou")
+		cible_ultime.peut_bouger = false
+		est_en_train_d_aspirer = true
+		await get_tree().create_timer(1.5).timeout
+		est_en_train_d_aspirer = false
+		lancer_explosion_gradient_et_execute()
+		
+	parent.reset_camera()
+
+func lancer_explosion_gradient_et_execute():
+	# On s'assure que la cible est toujours là
+	if is_instance_valid(cible_ultime):
+		var distance = global_position.distance_to(cible_ultime.global_position)
+		var parent = get_parent()
+		
+		# On identifie qui est la victime pour l'UI (si Hecker est p1, la victime est p2)
+		var pv_actuels_victime = parent.hp_p2 if player_id == 1 else parent.hp_p1
+		
+		# CALCUL DU SEUIL (20% des PV Max de la CIBLE, pas de Hecker !)
+		var seuil_execute = cible_ultime.hp_max * 0.2 
+		
+		print("DEBUG HECKER : Distance =", distance, " PV Cible =", pv_actuels_victime, " Seuil =", seuil_execute)
+
+		if pv_actuels_victime <= seuil_execute:
+			# --- L'EXÉCUTION ---
+			print("HECKER EXECUTE !")
+			for i in range(6): # On bombarde de dégâts pour garantir le KO
+				parent.infliger_degats(player_id)
+		else:
+			# --- DÉGÂTS NORMAUX (si l'ennemi est proche) ---
+			if distance < 400: # Rayon un peu plus large pour Hecker
+				parent.infliger_degats(player_id)
+				parent.infliger_degats(player_id)
+		
+		# Libération de la cible
+		cible_ultime.peut_bouger = true
+		cible_ultime = null
+
+func lancer_ruee_de_becanes_copie():
+	var parent = get_parent()
+	
+	# Gestion Musique
+	if parent.has_method("gerer_musique_combat"):
+		parent.gerer_musique_combat(false)
+	audio_s.stream = ost_ultime
+	audio_s.volume_db = -10
+	audio_s.play()
+	
+	# 1. Mise à jour UI (L'énergie est déjà mise à 0 par utiliser_ultime_vole)
+	parent.mettre_a_jour_ui()
+	
+	# 2. Cinématique (On utilise le splash de Pouit pour le style ou celui de Hecker)
+	parent.afficher_splashart_ulti(player_id, splash_pouit, false) 
+	
+	await get_tree().create_timer(2.0).timeout
+	
+	# 3. Lancement des motos
+	var timer_becane = 0.0
+	while timer_becane < 10.0:
+		spawn_moto_aleatoire()
+		var delai = randf_range(0.3, 0.7)
+		await get_tree().create_timer(delai).timeout
+		timer_becane += delai
+
+func spawn_moto_aleatoire():
+	if becane_scene:
+		var moto = becane_scene.instantiate()
+		
+		# --- RÉGLAGE DU SOL ---
+		# Remplace 650.0 par la position Y exacte de ton sol dans ton niveau
+		var hauteur_sol = 600.0 
+		
+		# On la fait apparaître à gauche, au niveau du sol
+		moto.global_position = Vector2(-200.0, hauteur_sol)
+		
+		moto.damage_owner = player_id
+		get_parent().add_child.call_deferred(moto)

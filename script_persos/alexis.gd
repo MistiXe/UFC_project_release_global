@@ -179,7 +179,8 @@ func lancer_parade_parisienne():
 			tw_barre.tween_property(parent, "energie_p2", 0.0, 20.0)
 		
 		await anim_player.animation_finished 
-
+	
+	
 	parent.reset_camera()
 	en_parade = true 
 	sprite.modulate = Color(1.5, 0.5, 2.0, 1.0) # Aura violette

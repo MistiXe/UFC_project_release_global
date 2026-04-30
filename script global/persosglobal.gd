@@ -32,18 +32,18 @@ var liste_persos = {
 		"stats": "",
 		"portrait": "res://persos/garric/garic_splash.png"
 	},
-	"Montaut": {
-		"scene" : "",
+	"montaut": {
+		"scene" : "res://scene_perso/Montaut.tscn",
 		"type" : "Attaque",
 		"description": "",
 		"stats": "",
-		"portrait": "res://persos/garric/garic_splash.png"
+		"portrait": "res://persos/montaut/garric_icon_pp.png"
 	},
-	"Pouit": {
-		"scene" : "",
+	"pouit": {
+		"scene" : "res://scene_perso/Pouit.tscn",
 		"type" : "Attaque",
 		"description": "",
 		"stats": "",
-		"portrait": "res://persos/garric/garic_splash.png"
+		"portrait": "res://persos/pouit/icon_pouit2.png"
 	}
 }

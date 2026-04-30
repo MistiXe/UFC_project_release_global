@@ -12,6 +12,8 @@
 [ext_resource type="Texture2D" uid="uid://fxmshnw7b5us" path="res://persos/alexisv1.png" id="9_u8q0g"]
 [ext_resource type="Texture2D" uid="uid://bct2i1en2ma5r" path="res://persos/brillon/splash_brillon.png" id="10_ikd4m"]
 [ext_resource type="Texture2D" uid="uid://dhai2cm7a0xjt" path="res://persos/garric/garic_splash.png" id="11_h6n8v"]
+[ext_resource type="Texture2D" uid="uid://b2lfftchw8jge" path="res://persos/montaut/garric_icon_pp.png" id="12_u8q0g"]
+[ext_resource type="Texture2D" uid="uid://uqdphl12w4d5" path="res://persos/pouit/icon_pouit2.png" id="13_ncsgm"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_n1c5n"]
 shader = ExtResource("2_ncsgm")
@@ -448,6 +450,7 @@ offset_bottom = 80.0
 size_flags_horizontal = 4
 size_flags_vertical = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_2k0yc")
+icon = ExtResource("12_u8q0g")
 expand_icon = true
 
 [node name="Label" type="Label" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Montaut" unique_id=867013250]
@@ -473,6 +476,7 @@ offset_bottom = 80.0
 size_flags_horizontal = 4
 size_flags_vertical = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_2k0yc")
+icon = ExtResource("13_ncsgm")
 expand_icon = true
 
 [node name="Label" type="Label" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Pouit" unique_id=1039258445]

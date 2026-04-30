@@ -1,16 +1,15 @@
 [gd_scene format=4 uid="uid://jud23ufk1rid"]
 
 [ext_resource type="Script" uid="uid://cn5iepviyln5g" path="res://script global/gameplay.gd" id="1_0m7cd"]
-[ext_resource type="FontFile" path="res://Super Smash TV.ttf" id="1_oe8ih"]
 [ext_resource type="Texture2D" uid="uid://ceb1q3n8ro1e4" path="res://ui_design/All.png" id="2_cbffv"]
 [ext_resource type="Texture2D" uid="uid://c2min4cmh3wkn" path="res://ui_design/20240713dragonRingFrame.png" id="3_fbudy"]
 [ext_resource type="FontFile" uid="uid://xq3nc6q7x48x" path="res://font/edo_sz/edosz.ttf" id="5_0m7cd"]
-[ext_resource type="FontFile" uid="uid://dxixa5qwp5b6w" path="res://font/Super Smash TV.ttf" id="5_dwrqy"]
+[ext_resource type="FontFile" uid="uid://dr1on7k76ctm2" path="res://font/Super Smash TV.ttf" id="5_dwrqy"]
 [ext_resource type="Texture2D" uid="uid://bvjrsjsf3qkbt" path="res://ui_design/20240709dragonBarB.png" id="7_1qy1k"]
 [ext_resource type="Shader" uid="uid://cgm4f4dn54xqa" path="res://script global/rond_ult.gdshader" id="7_e8ab0"]
 [ext_resource type="AudioStream" uid="uid://bfuprgi54cy73" path="res://song/musique_combat.mp3" id="8_0m7cd"]
 [ext_resource type="Texture2D" uid="uid://bycnrkibrpvi2" path="res://ui_design/vrai_image3.png" id="8_1qy1k"]
-[ext_resource type="Texture2D" uid="uid://8vqias67hepl" path="res://ui_design/tilemap_packed.png" id="10_5xop4"]
+[ext_resource type="Texture2D" uid="uid://djvq7d8hmkjyn" path="res://ui_design/tilemap_packed.png" id="10_5xop4"]
 [ext_resource type="VideoStream" uid="uid://bp8ruwixnw74v" path="res://ui_design/fond-animé_1.ogv" id="11_3n40r"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_fbudy"]
@@ -815,14 +814,14 @@ grow_vertical = 2
 
 [node name="reprendre" type="Button" parent="CanvasLayer/menu/VBoxContainer" unique_id=765718464]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_oe8ih")
+theme_override_fonts/font = ExtResource("5_dwrqy")
 theme_override_font_sizes/font_size = 34
 text = "REPRENDRE
 "
 
 [node name="menu2" type="Button" parent="CanvasLayer/menu/VBoxContainer" unique_id=152875395]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("1_oe8ih")
+theme_override_fonts/font = ExtResource("5_dwrqy")
 theme_override_font_sizes/font_size = 34
 text = "RETOUR AU MENU"
 
