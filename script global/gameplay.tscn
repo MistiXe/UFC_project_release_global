@@ -538,6 +538,7 @@ size = Vector2(1406.5, 1720.5)
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_0m7cd")
+metadata/_edit_horizontal_guides_ = [-130.0, 257.0]
 
 [node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="." unique_id=1676716827]
 unique_name_in_owner = true
@@ -868,11 +869,11 @@ process_material = SubResource("ParticleProcessMaterial_45aep")
 
 [node name="spawnJ1" type="Marker2D" parent="TM" unique_id=1712672470]
 unique_name_in_owner = true
-position = Vector2(350, 580)
+position = Vector2(400, 580)
 
 [node name="spawnJ2" type="Marker2D" parent="TM" unique_id=316533886]
 unique_name_in_owner = true
-position = Vector2(1000, 580)
+position = Vector2(750, 580)
 
 [node name="terrain" type="TileMapLayer" parent="TM" unique_id=427934580]
 position = Vector2(0, 500)

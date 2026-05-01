@@ -55,7 +55,10 @@ func _physics_process(delta):
 	var gameplay = get_parent()
 	# --- GESTION DU TERRITOIRE DE BRILLON ---
 	# On vérifie si l'extension est active et appartient à l'adversaire
-	var territory_active = gameplay.extension_active and gameplay.territory_owner != player_id
+	var territory_active = (
+	gameplay.extension_active and 
+	gameplay.territory_owner != player_id and 
+	gameplay.type_extension_actuelle == "Brillon")
 	var action_parade = "blocage_" + str(player_id)
 	
 	# 1. LOGIQUE DE BLOCAGE (Interdiction sous territoire)

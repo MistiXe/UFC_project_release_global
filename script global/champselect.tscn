@@ -14,6 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://dhai2cm7a0xjt" path="res://persos/garric/garic_splash.png" id="11_h6n8v"]
 [ext_resource type="Texture2D" uid="uid://b2lfftchw8jge" path="res://persos/montaut/garric_icon_pp.png" id="12_u8q0g"]
 [ext_resource type="Texture2D" uid="uid://uqdphl12w4d5" path="res://persos/pouit/icon_pouit2.png" id="13_ncsgm"]
+[ext_resource type="Texture2D" uid="uid://b6t5thgrlojbp" path="res://persos/dallaporta/dell_icon_v2.png" id="14_mv4k2"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_n1c5n"]
 shader = ExtResource("2_ncsgm")
@@ -485,6 +486,32 @@ layout_mode = 0
 offset_left = 110.0
 offset_top = 40.0
 offset_right = 210.0
+offset_bottom = 90.0
+theme_override_fonts/font = ExtResource("5_mv4k2")
+theme_override_font_sizes/font_size = 20
+
+[node name="Dallaporta" type="Control" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions" unique_id=1176789426]
+custom_minimum_size = Vector2(200, 100)
+layout_mode = 2
+
+[node name="dallaporta" type="Button" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Dallaporta" unique_id=838269176 groups=["slots_persos"]]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 0
+offset_right = 200.0
+offset_bottom = 80.0
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_2k0yc")
+icon = ExtResource("14_mv4k2")
+expand_icon = true
+
+[node name="Label" type="Label" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Dallaporta" unique_id=1629457095]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 0
+offset_left = 90.0
+offset_top = 40.0
+offset_right = 190.0
 offset_bottom = 90.0
 theme_override_fonts/font = ExtResource("5_mv4k2")
 theme_override_font_sizes/font_size = 20

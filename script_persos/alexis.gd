@@ -29,13 +29,13 @@ func _ready():
 		add_child(audio_s)
 	appliquer_cote_initial()
 
+func _actualiser_hitbox():
+	if has_node("HitboxPoing"):
+		$HitboxPoing.position.x = -750 if sprite.flip_h else 80
+		
 func appliquer_cote_initial():
-	if player_id == 2:
-		sprite.flip_h = true
-		$HitboxPoing.position.x = -580
-	else:
-		sprite.flip_h = false
-		$HitboxPoing.position.x = 80
+	sprite.flip_h = (player_id == 2)
+	_actualiser_hitbox()
 
 func _physics_process(delta):
 	# 1. Gravité
@@ -44,14 +44,18 @@ func _physics_process(delta):
 	
 	var gameplay = get_parent()
 	# Vérification du territoire adverse (Brillon)
-	var territory_active = gameplay.extension_active and gameplay.territory_owner != player_id
+	var territory_active = (
+		gameplay.extension_active and 
+		gameplay.territory_owner != player_id and 
+		gameplay.type_extension_actuelle == "Brillon" # <--- IMPORTANT : On précise Brillon ici
+	)
 	var action_parade = "blocage_" + str(player_id)
 	
 	if not peut_bouger:
 		velocity.x = 0
 		sprite.play("stay")
 		# FIX : On force la hitbox à se remettre sur le corps
-		$HitboxPoing.position.x = -580 if sprite.flip_h else 80
+		_actualiser_hitbox()
 		move_and_slide()
 		return
 	# --- LOGIQUE DE BLOCAGE ---
@@ -126,7 +130,7 @@ func _physics_process(delta):
 		velocity.x = direction * SPEED
 		sprite.flip_h = (direction < 0)
 		# Ajustement Hitbox selon direction
-		$HitboxPoing.position.x = -580 if sprite.flip_h else 80
+		_actualiser_hitbox()
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 

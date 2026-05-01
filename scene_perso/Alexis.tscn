@@ -181,16 +181,14 @@ animations = [{
 "speed": 10.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ib0dq"]
-radius = 12.0
-height = 33.926662
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7ovjw"]
+size = Vector2(23.946672, 44.773342)
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hcnan"]
-radius = 192.89993
-height = 731.8999
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1btcr"]
+size = Vector2(369.70004, 658.0001)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_llnus"]
-radius = 5.1535015
+radius = 9.895718
 
 [sub_resource type="Animation" id="Animation_4hlc4"]
 length = 0.5
@@ -320,33 +318,32 @@ _data = {
 }
 
 [node name="CharacterBody2D" type="CharacterBody2D" unique_id=1987385000]
-scale = Vector2(20, 20)
 collision_mask = 3
 script = ExtResource("1_k7fvt")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=72310354]
 texture_filter = 1
-position = Vector2(-600, -690)
 scale = Vector2(15, 15)
 sprite_frames = SubResource("SpriteFrames_4hlc4")
 animation = &"attaque"
 autoplay = "stay"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1597748706]
-position = Vector2(-595.2, -577.39996)
-scale = Vector2(15, 15)
-shape = SubResource("CapsuleShape2D_ib0dq")
+position = Vector2(-6.650001, 75.09999)
+scale = Vector2(14.999996, 14.999996)
+shape = SubResource("RectangleShape2D_7ovjw")
 
 [node name="HurtBox" type="Area2D" parent="." unique_id=698961886]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox" unique_id=1205525206]
-position = Vector2(-608.05, -588.45)
-shape = SubResource("CapsuleShape2D_hcnan")
+position = Vector2(2.2000732, 88.4)
+scale = Vector2(0.99999976, 0.99999976)
+shape = SubResource("RectangleShape2D_1btcr")
 
 [node name="HitboxPoing" type="Area2D" parent="." unique_id=1028915382]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxPoing" unique_id=1152397475]
-position = Vector2(-359, -692.05005)
+position = Vector2(342.95, 149.40002)
 scale = Vector2(10, 10)
 shape = SubResource("CircleShape2D_llnus")
 disabled = true

@@ -220,7 +220,7 @@ grow_vertical = 0
 size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("7_1bsys")
 theme_override_font_sizes/font_size = 20
-text = "Version 0.4"
+text = "Version 0.5"
 vertical_alignment = 1
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=570791542]

@@ -290,13 +290,11 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_nyone"]
-radius = 137.0
-height = 596.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ebvlr"]
+size = Vector2(393, 670)
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3g778"]
-radius = 181.0
-height = 698.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_w5t8g"]
+size = Vector2(396, 674.5)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_blop0"]
 radius = 76.0
@@ -448,7 +446,6 @@ script = ExtResource("1_ctvbe")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1207473909]
 texture_filter = 1
-position = Vector2(-557, -519)
 scale = Vector2(14.597, 15)
 sprite_frames = SubResource("SpriteFrames_fpxll")
 animation = &"attaque"
@@ -456,19 +453,20 @@ autoplay = "stay"
 frame = 7
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=421908492]
-position = Vector2(-601, -396)
-shape = SubResource("CapsuleShape2D_nyone")
+position = Vector2(16.5, 94)
+shape = SubResource("RectangleShape2D_ebvlr")
 
 [node name="HurtBox" type="Area2D" parent="." unique_id=202545074]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox" unique_id=1516476691]
-position = Vector2(-553, -411)
-shape = SubResource("CapsuleShape2D_3g778")
+position = Vector2(15, 88.25)
+shape = SubResource("RectangleShape2D_w5t8g")
 
 [node name="HitboxPoing" type="Area2D" parent="." unique_id=1741625695]
+unique_name_in_owner = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxPoing" unique_id=879003142]
-position = Vector2(-54, -332)
+position = Vector2(402, 176)
 shape = SubResource("CapsuleShape2D_blop0")
 disabled = true
 

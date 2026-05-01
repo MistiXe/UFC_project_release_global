@@ -28,9 +28,12 @@ var shake_intensity : float = 0.0
 var taille_voulue = 0.5
 var extension_active = false
 var territory_owner : int = 0
-@onready var fond_normal = $VideoStreamPlayer# Ton fond actuel
+var type_extension_actuelle = ""
+@onready var vsp = $VideoStreamPlayer# Ton fond actuel
 # Prépare un Sprite ou un ColorRect noir/violet pour le fond de l'ultime
-var video_territoire = preload("res://persos/brillon/bg_ult_brillon.ogv")# --- INITIALISATION ---
+var video_base = preload("res://ui_design/fond-animé_1.ogv")
+var video_brillon = preload("res://persos/brillon/bg_ult_brillon.ogv")
+var video_dallaporta = preload("res://song/cyberpunk-rain-city-pixel-moewalls-com.ogv")
 func _ready():
 	# On fixe le zoom une fois pour toutes pour éviter les décalages
 	
@@ -126,6 +129,12 @@ func infliger_degats(frappeur_id, donne_energie = true):
 	var cible = $p2 if frappeur_id == 1 else $p1
 	var frappeur = $p1 if frappeur_id == 1 else $p2
 	var victime = $p2 if frappeur_id == 1 else $p1
+	# --- LOGIQUE DE PERTE DE TEMPS (DALLAPORTA UNIQUEMENT) ---
+	if victime.has_method("perdre_temps_ultime"):
+		victime.recevoir_coup() # Brise son invisibilité
+		
+		if extension_active and type_extension_actuelle == "Dallaporta" and territory_owner == victime.player_id:
+			victime.perdre_temps_ultime(10.0)
 	
 	if cible.en_blocage:
 		print("BLOCAGE PARFAIT !")
@@ -310,32 +319,47 @@ func activer_extension(lanceur_id):
 	extension_active = true
 	territory_owner = lanceur_id
 	
+	# --- DÉTECTION DU JOUEUR ---
+	var frappeur = $p1 if lanceur_id == 1 else $p2
 	
-	# --- PHASE 1 : LA BRISURE (Impact visuel) ---
-	# 1. Tremblement immédiat et violent
-	shake_intensity = 60.0 
+	# --- DÉTECTION DU TYPE D'EXTENSION (INTELLIGENTE POUR HECKER) ---
+	# Si le perso a un 'ultime_vole' non nul (cas de Hecker), on prend ce type.
+	# Sinon, on prend le nom du personnage d'origine.
+	if "ultime_vole" in frappeur and frappeur.ultime_vole != null:
+		type_extension_actuelle = frappeur.ultime_vole
+	else:
+		var p_res = Persosglobal.liste_persos[Persosglobal.choix_p1 if lanceur_id == 1 else Persosglobal.choix_p2]
+		type_extension_actuelle = p_res["nom"]
+	print("TYPE D'EXTENSION ACTIVÉ : ", type_extension_actuelle)
 	
-	# 2. Flash et Brisure
+	# --- PHASE 1 : IMPACT VISUEL (LA BRISURE) ---
+	shake_intensity = 60.0
+	
 	var flash = ColorRect.new()
 	flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	flash.color = Color.WHITE
 	$CanvasLayer.add_child(flash)
 	
-	# Si tu as un sprite de fissures, on l'affiche
 	if has_node("CanvasLayer/EcranBrisi"):
 		$CanvasLayer/EcranBrisi.visible = true
 		$CanvasLayer/EcranBrisi.modulate.a = 1.0
 
-	# --- PHASE 2 : TRANSITION VERS LA VIDÉO ---
+	# --- PHASE 2 : CHANGEMENT DE DÉCOR VIDÉO ---
 	if has_node("VideoStreamPlayer"):
-		var video_normale = $VideoStreamPlayer.stream
+		var vsp = $VideoStreamPlayer
+		vsp.stop()
 		
-		# On change la vidéo "derrière" le flash
-		$VideoStreamPlayer.stop()
-		$VideoStreamPlayer.stream = video_territoire
-		$VideoStreamPlayer.play()
+		# On utilise .to_lower() pour éviter les erreurs de majuscules/minuscules
+		var nom_test = type_extension_actuelle.to_lower()
 		
-		# On fait disparaître le flash et les fissures progressivement
+		if nom_test == "brillon":
+			vsp.stream = video_brillon # Assure-toi que cette variable est bien déclarée en haut
+		elif nom_test == "dallaporta" or "hecker":
+			vsp.stream = video_dallaporta # Assure-toi que cette variable est bien déclarée en haut
+		
+		vsp.play()
+		
+		# Transition fluide pour enlever le flash et les fissures
 		var tw_trans = create_tween().set_parallel(true)
 		tw_trans.tween_property(flash, "color:a", 0.0, 0.4)
 		if has_node("CanvasLayer/EcranBrisi"):
@@ -343,14 +367,31 @@ func activer_extension(lanceur_id):
 		
 		tw_trans.finished.connect(func(): flash.queue_free())
 
-		# --- PHASE 3 : DURÉE DE L'EXTENSION ---
+	# --- PHASE 3 : GESTION DE LA DURÉE ---
+	# Pour Brillon : Durée fixe de 30 secondes gérée par le gameplay.
+	if type_extension_actuelle.to_lower() == "brillon":
 		await get_tree().create_timer(30.0).timeout
-		
-		# --- PHASE 4 : SORTIE (Nouvelle brisure pour revenir) ---
-		shake_intensity = 40.0
-		$VideoStreamPlayer.stop()
-		$VideoStreamPlayer.stream = video_normale
-		$VideoStreamPlayer.play()
+		# On vérifie que l'extension est toujours active avant de couper
+		if extension_active and type_extension_actuelle.to_lower() == "brillon":
+			fin_extension_visuelle()
+			
+	# Pour Dallaporta : La fin est gérée directement dans le script du perso 
+	# (dallaporta.gd ou hecker.gd) via l'appel à fin_extension_visuelle().
+
+func fin_extension_visuelle():
+	if not extension_active: return
 	
 	extension_active = false
 	territory_owner = 0
+	type_extension_actuelle = ""
+	
+	# Secousse de sortie
+	shake_intensity = 40.0
+	
+	# Retour au fond normal
+	if has_node("VideoStreamPlayer"):
+		vsp.stop()
+		vsp.stream = video_base
+		vsp.play()
+	
+	print("Retour au monde normal")

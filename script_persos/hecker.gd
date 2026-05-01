@@ -17,6 +17,9 @@ var en_train_dattaquer = false
 var en_parade = false 
 var en_blocage = false
 var timer_blocage = 0.0
+var extension_active = false
+var temps_restant_extension = 0.0
+var bonus_degats_temporel = 0.0 
 
 # --- ASSETS ---
 var icone_ultime = preload("res://persos/hecker/assets_hecker/Vol ancestral.png")
@@ -26,6 +29,7 @@ var splash_brillon = preload("res://persos/brillon/splash_brillonv1.png")
 var splash_garric = preload("res://persos/garric/garric_real_splash.png")
 var splash_montaut = preload("res://persos/montaut/splash_ult_montautv3.png")
 var splash_pouit = preload("res://persos/pouit/splash_ultv2.png")
+var splash_dall = preload("res://persos/dallaporta/splash_ult_dallv2.png")
 @onready var audio_s = AudioStreamPlayer.new()
 var ost_ultime = preload("res://song/Voleur de Sorts_hecker_theme.mp3")
 @onready var sprite = $AnimatedSprite2D
@@ -33,7 +37,7 @@ var ost_ultime = preload("res://song/Voleur de Sorts_hecker_theme.mp3")
 @export var becane_scene : PackedScene = preload("res://script_persos/becane_objet.tscn") # À charger avec ton fichier moto.tscn
 
 #@onready var particules = $ParticulesGradient
-var liste_personnages = ["Pouit"]
+var liste_personnages = ["Dallaporta"]
 
 var ultime_vole = null          
 var icone_origine = preload("res://persos/hecker/assets_hecker/Vol ancestral.png")
@@ -48,14 +52,19 @@ func appliquer_cote_initial():
 
 func _actualiser_hitbox():
 	if has_node("HitboxPoing"):
-		$HitboxPoing.position.x = -1080 if sprite.flip_h else 80
+		$HitboxPoing.position.x = -850 if sprite.flip_h else 80
 
 func _physics_process(delta):
 	if not is_on_floor():
 		velocity.y += gravity * delta
 	
 	var gameplay = get_parent()
-	var territory_active = gameplay.extension_active and gameplay.territory_owner != player_id
+		
+	var territory_active = (
+		gameplay.extension_active and 
+		gameplay.territory_owner != player_id and 
+		gameplay.type_extension_actuelle == "Brillon" # <--- IMPORTANT : On précise Brillon ici
+	)
 	var action_parade = "blocage_" + str(player_id)
 
 	# --- 1. VERROU PESANTEUR (STUN GARRIC) ---
@@ -108,6 +117,14 @@ func _physics_process(delta):
 
 	if Input.is_action_just_pressed(action_attaque):
 		frapper()
+	
+	if extension_active:
+		temps_restant_extension -= delta
+		# Calcul du bonus (même si on l'utilise différemment, ça sert de timer)
+		bonus_degats_temporel = (30.0 - temps_restant_extension) * 3.0
+		
+		if temps_restant_extension <= 0:
+			fin_extension() # La fonction qui remet la vitesse normale et le décor
 
 	# DÉPLACEMENT (Inversion territoire)
 	var direction = Input.get_axis(move_left, move_right)
@@ -178,6 +195,8 @@ func phase_vol_ancestral():
 			icone_ultime = preload("res://persos/montaut/icon_descente.png")	
 		elif ultime_vole == "Pouit":
 			icone_ultime = preload("res://persos/pouit/icon_ult.png")	
+		elif ultime_vole == "Dallaporta":
+			icone_ultime = preload("res://persos/dallaporta/splash_iconv2.png")
 			
 		parent.mettre_a_jour_ui() # Pour que l'icône apparaisse sur la barre
 		parent.reset_camera()
@@ -191,7 +210,14 @@ func set_player_id(id):
 func _on_hitbox_poing_area_entered(area):
 	if area.name == "HurtBox":
 		var cible = area.get_parent()
-		if cible != self: get_parent().infliger_degats(player_id)
+		if cible != self:
+			# On inflige les dégâts de base
+			get_parent().infliger_degats(player_id)
+			
+			# SI Hecker a volé l'ultime de Dallaporta ET qu'il est actif :
+			# On inflige une deuxième instance de dégâts pour simuler le bonus temporel
+			if extension_active and bonus_degats_temporel > 10.0:
+				get_parent().infliger_degats(player_id, false) # false pour ne pas donner double énergie
 
 func utiliser_ultime_vole():
 	en_train_dattaquer = true
@@ -224,6 +250,10 @@ func utiliser_ultime_vole():
 			icone_ultime = preload("res://persos/pouit/icon_ult.png")
 			print("Icône Pouit chargée !")
 			lancer_ruee_de_becanes_copie()
+		"Dallaporta":
+			icone_ultime = preload("res://persos/dallaporta/splash_iconv2.png")
+			print("Icône Dallaporta chargée !")
+			lancer_extension_temporelle_copie()
 			
 			
 
@@ -467,3 +497,64 @@ func spawn_moto_aleatoire():
 		
 		moto.damage_owner = player_id
 		get_parent().add_child.call_deferred(moto)
+
+func lancer_extension_temporelle_copie():
+	var parent = get_parent()
+	en_train_dattaquer = true # Immobilise Hecker pendant l'animation de lancement
+	
+	# --- ÉTAPE CRUCIALE POUR LE DÉCOR ---
+	# On définit explicitement le nom du sort pour que le Gameplay 
+	# puisse le lire dans 2 secondes lors de l'activation du décor.
+	self.ultime_vole = "Dallaporta" 
+	
+	# 1. On prévient le Gameplay des variables de base
+	parent.extension_active = true
+	parent.territory_owner = player_id
+	parent.type_extension_actuelle = "Dallaporta" 
+	
+	# 2. Activation de la logique interne (Chrono et Bonus)
+	self.extension_active = true 
+	self.temps_restant_extension = 30.0
+	
+	# 3. Gestion Audio
+	if parent.has_method("gerer_musique_combat"):
+		parent.gerer_musique_combat(false)
+	parent.stopper_tous_les_sons_ultime()
+	
+	audio_s.stream = ost_ultime
+	audio_s.volume_db = -5
+	audio_s.play()
+	
+	# 4. Lancement du visuel
+	# Le 'true' à la fin déclenche la fonction 'activer_extension' du gameplay
+	# juste après que le Splash Art ait fini de s'afficher.
+	parent.afficher_splashart_ulti(player_id, splash_dall, true) 
+	
+	# 5. Effet de ralentissement sur l'adversaire
+	var cible = parent.get_node("p2") if player_id == 1 else parent.get_node("p1")
+	if is_instance_valid(cible):
+		cible.SPEED = cible.SPEED * 0.5
+		
+	# On libère Hecker pour qu'il puisse attaquer pendant son extension
+	en_train_dattaquer = false
+func fin_extension():
+	extension_active = false
+	bonus_degats_temporel = 0
+	var parent = get_parent()
+	parent.stopper_tous_les_sons_ultime()
+	if parent.has_method("gerer_musique_combat"):
+		parent.gerer_musique_combat(true)
+	
+	var cible = parent.get_node("p2") if player_id == 1 else parent.get_node("p1")
+	cible.SPEED = cible.SPEED * 2.0 
+	parent.fin_extension_visuelle()
+
+func _gestion_extension_temps_copie(delta):
+	temps_restant_extension -= delta
+	
+	# Bonus dégâts de Dallaporta (optionnel si tu veux que Hecker tape plus fort aussi)
+	bonus_degats_temporel = (30.0 - temps_restant_extension) * 3.0
+	
+	if temps_restant_extension <= 0:
+		temps_restant_extension = 0
+		fin_extension() # Appelle ta fonction qui reset tout

@@ -6,6 +6,7 @@ var choix_p2 = ""
 var liste_persos = {
 	"hecker": {
 		"scene": "res://scene_perso/Hecker.tscn",
+		"nom": "Hecker",
 		"type": "Attaque",
 		"description": "Un hacker rapide qui utilise des glitchs.",
 		"stats": "Force: ⭐⭐⭐\nVitesse: ⭐⭐⭐⭐⭐",
@@ -13,6 +14,7 @@ var liste_persos = {
 	},
 	"alexis": {
 		"scene": "res://scene_perso/Alexis.tscn",
+		"nom" : "Alexis",
 		"type": "Defense",
 		"description": "Un guerrier robuste et flemmard surtout.",
 		"stats": "Force: ⭐⭐⭐⭐⭐\nVitesse: ⭐⭐",
@@ -23,10 +25,12 @@ var liste_persos = {
 		"type" : "Attaque",
 		"description": "",
 		"stats": "",
+		"nom": "Brillon",
 		"portrait": "res://persos/brillon/splash_brillon.png"
 	},
 	"garric": {
 		"scene" : "res://scene_perso/Garric.tscn",
+		"nom": "Garric",
 		"type" : "Defense",
 		"description": "",
 		"stats": "",
@@ -34,6 +38,7 @@ var liste_persos = {
 	},
 	"montaut": {
 		"scene" : "res://scene_perso/Montaut.tscn",
+		"nom": "Montaut",
 		"type" : "Attaque",
 		"description": "",
 		"stats": "",
@@ -41,9 +46,18 @@ var liste_persos = {
 	},
 	"pouit": {
 		"scene" : "res://scene_perso/Pouit.tscn",
+		"nom": "Pouit",
 		"type" : "Attaque",
 		"description": "",
 		"stats": "",
 		"portrait": "res://persos/pouit/icon_pouit2.png"
+	},
+	"dallaporta": {
+		"scene" : "res://scene_perso/Dallaporta.tscn",
+		"type" : "Attaque",
+		"description": "",
+		"stats": "",
+		"nom": "Dallaporta",
+		"portrait": "res://persos/dallaporta/dell_icon_v2.png"
 	}
 }
