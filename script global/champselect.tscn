@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://b2lfftchw8jge" path="res://persos/montaut/garric_icon_pp.png" id="12_u8q0g"]
 [ext_resource type="Texture2D" uid="uid://uqdphl12w4d5" path="res://persos/pouit/icon_pouit2.png" id="13_ncsgm"]
 [ext_resource type="Texture2D" uid="uid://b6t5thgrlojbp" path="res://persos/dallaporta/dell_icon_v2.png" id="14_mv4k2"]
+[ext_resource type="Shader" uid="uid://4gg815xknsuj" path="res://script global/transi_g.gdshader" id="16_jfns8"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_n1c5n"]
 shader = ExtResource("2_ncsgm")
@@ -74,6 +75,12 @@ shadow_offset = Vector2(4, 4)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n1c5n"]
 bg_color = Color(0, 0, 0, 0.60784316)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1ts3i"]
+shader = ExtResource("16_jfns8")
+shader_parameter/circle_size = 1.05
+shader_parameter/screen_width = 1153.0
+shader_parameter/screen_height = 648.0
 
 [node name="Node2D" type="Control" unique_id=1352417490]
 layout_mode = 3
@@ -244,7 +251,7 @@ theme_override_constants/separation = -10
 
 [node name="MarginContainer" type="MarginContainer" parent="ecranprincipal/bas/VBoxContainer" unique_id=783933965]
 layout_mode = 2
-theme_override_constants/margin_left = 20
+theme_override_constants/margin_left = 50
 theme_override_constants/margin_top = 2
 theme_override_constants/margin_bottom = 10
 
@@ -330,10 +337,10 @@ layout_mode = 2
 
 [node name="hecker" type="Button" parent="ecranprincipal/bas/VBoxContainer/ScrollContainer/rotation/grillechampions/Hecker" unique_id=220323689 groups=["slots_persos"]]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 80)
+custom_minimum_size = Vector2(100, 50)
 layout_mode = 0
 offset_right = 200.0
-offset_bottom = 50.0
+offset_bottom = 80.0
 size_flags_horizontal = 4
 size_flags_vertical = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_2k0yc")
@@ -580,5 +587,17 @@ bbcode_enabled = true
 stream = ExtResource("7_8hhtu")
 autoplay = true
 parameters/looping = true
+
+[node name="CircleTransi" type="ColorRect" parent="." unique_id=146000899]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_1ts3i")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
 
 [connection signal="pressed" from="Control/TextureButton" to="." method="_on_retour_focus_entered"]

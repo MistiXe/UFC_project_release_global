@@ -6,6 +6,11 @@ var JUMP_VELOCITY = -900.0
 var gravity = 1500.0
 var player_id = 1 
 var hp_max = 6500
+var dash_cooldown : float = 5.0
+var dash_timer : float = 0.0
+var en_dash : bool = false
+var vitesse_dash : float = 2000.0  
+var duree_dash : float = 0.15      
 
 # --- ÉTATS ---
 var peut_bouger = true 
@@ -60,7 +65,7 @@ func _physics_process(delta):
 	gameplay.territory_owner != player_id and 
 	gameplay.type_extension_actuelle == "Brillon")
 	var action_parade = "blocage_" + str(player_id)
-	
+	gerer_dash(delta)
 	# 1. LOGIQUE DE BLOCAGE (Interdiction sous territoire)
 	if territory_active:
 		en_blocage = false
@@ -85,48 +90,48 @@ func _physics_process(delta):
 	# Force la hitbox à suivre le regard
 	if has_node("HitboxPoing"):
 		$HitboxPoing.position.x = -680 if sprite.flip_h else 150
+	if not en_dash:
+		# --- INPUTS ---
+		var move_left = "gauche_" + str(player_id)
+		var move_right = "droite_" + str(player_id)
+		var move_jump = "saut_" + str(player_id)
+		var action_attaque = "attaque_" + str(player_id)
+		var action_ultime = "ultime_" + str(player_id)
 
-	# --- INPUTS ---
-	var move_left = "gauche_" + str(player_id)
-	var move_right = "droite_" + str(player_id)
-	var move_jump = "saut_" + str(player_id)
-	var action_attaque = "attaque_" + str(player_id)
-	var action_ultime = "ultime_" + str(player_id)
+		# 2. SAUT (Inversion sous territoire)
+		if Input.is_action_just_pressed(move_jump) and is_on_floor():
+			if territory_active:
+				velocity.y = JUMP_VELOCITY * 0.8
+				var recul = 1000.0 if not sprite.flip_h else -1000.0
+				velocity.x = -recul # Projeté en arrière
+			else:
+				velocity.y = JUMP_VELOCITY
 
-	# 2. SAUT (Inversion sous territoire)
-	if Input.is_action_just_pressed(move_jump) and is_on_floor():
+		if Input.is_action_just_pressed(action_ultime):
+			lancer_lecon_particuliere()
+
+		if Input.is_action_just_pressed(action_attaque):
+			frapper()
+
+		# 3. DÉPLACEMENT (Inversion sous territoire)
+		var direction = Input.get_axis(move_left, move_right)
 		if territory_active:
-			velocity.y = JUMP_VELOCITY * 0.8
-			var recul = 1000.0 if not sprite.flip_h else -1000.0
-			velocity.x = -recul # Projeté en arrière
+			direction = -direction # GAUCHE devient DROITE
+		
+		if direction != 0 and peut_bouger:
+			velocity.x = direction * SPEED
+			sprite.flip_h = (direction < 0)
 		else:
-			velocity.y = JUMP_VELOCITY
-
-	if Input.is_action_just_pressed(action_ultime):
-		lancer_lecon_particuliere()
-
-	if Input.is_action_just_pressed(action_attaque):
-		frapper()
-
-	# 3. DÉPLACEMENT (Inversion sous territoire)
-	var direction = Input.get_axis(move_left, move_right)
-	if territory_active:
-		direction = -direction # GAUCHE devient DROITE
-	
-	if direction != 0 and peut_bouger:
-		velocity.x = direction * SPEED
-		sprite.flip_h = (direction < 0)
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-	
-	# --- 4. GESTION DES ANIMATIONS ---
-	if not en_train_dattaquer:
-		if not is_on_floor():
-			sprite.play("jump")
-		elif direction != 0:
-			sprite.play("walk")
-		else:
-			sprite.play("stay")
+			velocity.x = move_toward(velocity.x, 0, SPEED)
+		
+		# --- 4. GESTION DES ANIMATIONS ---
+		if not en_train_dattaquer:
+			if not is_on_floor():
+				sprite.play("jump")
+			elif direction != 0:
+				sprite.play("walk")
+			else:
+				sprite.play("stay")
 
 	move_and_slide()
 # --- PASSIF ---
@@ -231,3 +236,31 @@ func _on_hitbox_poing_area_entered(area):
 		var cible = area.get_parent()
 		if cible != self:
 			get_parent().infliger_degats(player_id)
+func gerer_dash(delta):
+	# On décrémente le timer de cooldown
+	if dash_timer > 0:
+		dash_timer -= delta
+	
+	# Détection de l'input selon l'ID du joueur
+	var action = "dash_p1" if player_id == 1 else "dash_p2"
+	
+	if Input.is_action_just_pressed(action) and dash_timer <= 0 and peut_bouger:
+		lancer_dash()
+
+func lancer_dash():
+	dash_timer = dash_cooldown
+	en_dash = true
+	
+	# On détermine la direction (basée sur le flip_h du sprite)
+	var direction = -1 if $AnimatedSprite2D.flip_h else 1
+	
+	# On applique la vitesse de dash
+	velocity.x = direction * vitesse_dash
+	
+	# Petit effet visuel : on peut changer la couleur ou l'opacité
+	modulate.a = 0.5
+	
+	# On arrête le dash après duree_dash secondes
+	await get_tree().create_timer(duree_dash).timeout
+	en_dash = false
+	modulate.a = 1.0

@@ -10,6 +10,11 @@ const DASH_FORCE = 2500.0
 var hp_max = 1050
 var player_id = 1 
 const DASH_SPEED = 2000.0 
+var dash_cooldown : float = 5.0
+var dash_timer : float = 0.0
+var en_dash_c : bool = false
+var vitesse_dash : float = 2000.0  # Ajustez selon la puissance voulue
+var duree_dash : float = 0.15      # Temps pendant lequel le perso fonce
 
 # --- ÉTATS ---
 var peut_bouger = false 
@@ -75,7 +80,7 @@ func _physics_process(delta):
 			en_blocage = false
 			timer_blocage = 0.0
 			if not en_parade: sprite.modulate = Color(1, 1, 1, 1)
-
+	
 	if (Input.is_action_pressed(action_parade) and not territory_active) or en_dash:
 		move_and_slide()
 		return
@@ -84,51 +89,53 @@ func _physics_process(delta):
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 		move_and_slide()
 		return 
-
-	# --- 2. INPUTS AVEC INVERSION ---
-	var move_left = "gauche_" + str(player_id)
-	var move_right = "droite_" + str(player_id)
-	var move_jump = "saut_" + str(player_id)
-	var action_attaque = "attaque_" + str(player_id)
-	var action_ultime = "ultime_" + str(player_id)
+	gerer_dash(delta)
 	
-	# Lancement Ultime
-	if Input.is_action_just_pressed(action_ultime) and is_on_floor():
-		var energie = gameplay.energie_p1 if player_id == 1 else gameplay.energie_p2
-		if energie >= 100:
-			lancer_extension_territoire()
+	if not en_dash_c:
+		# --- 2. INPUTS AVEC INVERSION ---
+		var move_left = "gauche_" + str(player_id)
+		var move_right = "droite_" + str(player_id)
+		var move_jump = "saut_" + str(player_id)
+		var action_attaque = "attaque_" + str(player_id)
+		var action_ultime = "ultime_" + str(player_id)
+		
+		# Lancement Ultime
+		if Input.is_action_just_pressed(action_ultime) and is_on_floor():
+			var energie = gameplay.energie_p1 if player_id == 1 else gameplay.energie_p2
+			if energie >= 100:
+				lancer_extension_territoire()
 
-	if Input.is_action_just_pressed(action_attaque):
-		frapper()
+		if Input.is_action_just_pressed(action_attaque):
+			frapper()
 
-	# SAUT (Inversion : Projection arrière)
-	if Input.is_action_just_pressed(move_jump) and is_on_floor():
+		# SAUT (Inversion : Projection arrière)
+		if Input.is_action_just_pressed(move_jump) and is_on_floor():
+			if territory_active:
+				velocity.y = JUMP_VELOCITY * 0.8 # Saute moins haut
+				var recul = 1000.0 if not sprite.flip_h else -1000.0
+				velocity.x = -recul # Projeté en arrière
+			else:
+				velocity.y = JUMP_VELOCITY
+
+		# DÉPLACEMENT (Inversion)
+		var direction = Input.get_axis(move_left, move_right)
 		if territory_active:
-			velocity.y = JUMP_VELOCITY * 0.8 # Saute moins haut
-			var recul = 1000.0 if not sprite.flip_h else -1000.0
-			velocity.x = -recul # Projeté en arrière
+			direction = -direction # GAUCHE devient DROITE
+		
+		if direction != 0:
+			velocity.x = direction * SPEED
+			sprite.flip_h = (direction < 0)
+			$HitboxPoing.position.x = -980 if sprite.flip_h else 80
 		else:
-			velocity.y = JUMP_VELOCITY
+			velocity.x = move_toward(velocity.x, 0, SPEED)
 
-	# DÉPLACEMENT (Inversion)
-	var direction = Input.get_axis(move_left, move_right)
-	if territory_active:
-		direction = -direction # GAUCHE devient DROITE
-	
-	if direction != 0:
-		velocity.x = direction * SPEED
-		sprite.flip_h = (direction < 0)
-		$HitboxPoing.position.x = -980 if sprite.flip_h else 80
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-
-	# Animations
-	if not is_on_floor():
-		sprite.play("jump") 
-	elif direction != 0:
-		sprite.play("walk")
-	else:
-		sprite.play("stay")
+		# Animations
+		if not is_on_floor():
+			sprite.play("jump") 
+		elif direction != 0:
+			sprite.play("walk")
+		else:
+			sprite.play("stay")
 
 	move_and_slide()
 
@@ -250,3 +257,33 @@ func afficher_indicateur_combo():
 	tw_fade.tween_interval(0.6) # On laisse le texte affiché un peu
 	tw_fade.tween_property(label_combo, "modulate:a", 0.0, 0.2) # Fondu sortant
 	tw_fade.finished.connect(func(): label_combo.visible = false);
+
+
+func gerer_dash(delta):
+	# On décrémente le timer de cooldown
+	if dash_timer > 0:
+		dash_timer -= delta
+	
+	# Détection de l'input selon l'ID du joueur
+	var action = "dash_p1" if player_id == 1 else "dash_p2"
+	
+	if Input.is_action_just_pressed(action) and dash_timer <= 0 and peut_bouger:
+		lancer_dash()
+
+func lancer_dash():
+	dash_timer = dash_cooldown
+	en_dash_c = true
+	
+	# On détermine la direction (basée sur le flip_h du sprite)
+	var direction = -1 if $AnimatedSprite2D.flip_h else 1
+	
+	# On applique la vitesse de dash
+	velocity.x = direction * vitesse_dash
+	
+	# Petit effet visuel : on peut changer la couleur ou l'opacité
+	modulate.a = 0.5
+	
+	# On arrête le dash après duree_dash secondes
+	await get_tree().create_timer(duree_dash).timeout
+	en_dash_c = false
+	modulate.a = 1.0

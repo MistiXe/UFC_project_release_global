@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://dvg16gx0tcorv" path="res://ui_design/eteindre2.png" id="8_iqepy"]
 [ext_resource type="Texture2D" uid="uid://dr4nyk3nx80gk" path="res://ui_design/20240707dragon9SlicesD.png" id="8_jspdm"]
 [ext_resource type="AudioStream" uid="uid://0e70mrhhvxcn" path="res://song/Début du Kombat.mp3" id="12_1bsys"]
+[ext_resource type="Shader" uid="uid://d08y7flgjfces" path="res://script global/menu_glissant.gdshader" id="13_0x4ex"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h1wq0"]
 shader = ExtResource("2_1bsys")
@@ -33,6 +34,10 @@ _data = {
 &"fondu": SubResource("Animation_82s3l"),
 &"lumiere": SubResource("Animation_jryq1")
 }
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ggutm"]
+shader = ExtResource("13_0x4ex")
+shader_parameter/progress = 0.0
 
 [node name="Node2D" type="Control" unique_id=1547103146]
 layout_mode = 3
@@ -150,61 +155,6 @@ theme_override_fonts/font = ExtResource("7_1bsys")
 theme_override_font_sizes/font_size = 30
 text = "Tutoriel"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/panneau_bouton_menu/buttons_menu" unique_id=940192736]
-custom_minimum_size = Vector2(0, 50)
-layout_mode = 2
-alignment = 1
-
-[node name="son" type="TextureButton" parent="VBoxContainer/panneau_bouton_menu/buttons_menu/HBoxContainer" unique_id=1766086698]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-size_flags_horizontal = 4
-texture_normal = ExtResource("8_jspdm")
-texture_pressed = ExtResource("6_nrnbx")
-texture_hover = ExtResource("6_nrnbx")
-texture_focused = ExtResource("6_nrnbx")
-
-[node name="son2" type="TextureRect" parent="VBoxContainer/panneau_bouton_menu/buttons_menu/HBoxContainer/son" unique_id=991764260]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("7_nrnbx")
-expand_mode = 1
-
-[node name="quitter" type="TextureButton" parent="VBoxContainer/panneau_bouton_menu/buttons_menu/HBoxContainer" unique_id=1954677255]
-custom_minimum_size = Vector2(50, 50)
-layout_mode = 2
-size_flags_horizontal = 4
-texture_normal = ExtResource("8_jspdm")
-texture_pressed = ExtResource("6_nrnbx")
-texture_hover = ExtResource("6_nrnbx")
-texture_focused = ExtResource("6_nrnbx")
-
-[node name="quitter2" type="TextureRect" parent="VBoxContainer/panneau_bouton_menu/buttons_menu/HBoxContainer/quitter" unique_id=1169548047]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("8_iqepy")
-expand_mode = 1
-
 [node name="Label" type="Label" parent="." unique_id=2011402535]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 1
@@ -220,8 +170,73 @@ grow_vertical = 0
 size_flags_horizontal = 4
 theme_override_fonts/font = ExtResource("7_1bsys")
 theme_override_font_sizes/font_size = 20
-text = "Version 0.5"
+text = "Version 0.6"
 vertical_alignment = 1
+
+[node name="son" type="TextureButton" parent="." unique_id=1766086698]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 1
+offset_left = 60.0
+offset_top = 10.0
+offset_right = 80.0
+offset_bottom = 30.0
+scale = Vector2(2, 2)
+size_flags_horizontal = 4
+texture_normal = ExtResource("8_jspdm")
+texture_pressed = ExtResource("6_nrnbx")
+texture_hover = ExtResource("6_nrnbx")
+texture_focused = ExtResource("6_nrnbx")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="son2" type="TextureRect" parent="son" unique_id=991764260]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -5.0
+offset_top = -5.0
+offset_right = 5.0
+offset_bottom = 5.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("7_nrnbx")
+expand_mode = 1
+
+[node name="quitter" type="TextureButton" parent="." unique_id=1954677255]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 1
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 30.0
+offset_bottom = 30.0
+scale = Vector2(2, 2)
+size_flags_horizontal = 4
+texture_normal = ExtResource("8_jspdm")
+texture_pressed = ExtResource("6_nrnbx")
+texture_hover = ExtResource("6_nrnbx")
+texture_focused = ExtResource("6_nrnbx")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="quitter2" type="TextureRect" parent="quitter" unique_id=1169548047]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -5.0
+offset_top = -5.0
+offset_right = 5.0
+offset_bottom = 5.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_iqepy")
+expand_mode = 1
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=570791542]
 stream = ExtResource("12_1bsys")
@@ -232,4 +247,18 @@ parameters/looping = true
 unique_name_in_owner = true
 libraries/ = SubResource("AnimationLibrary_ytr4m")
 
+[node name="WaterTransition" type="ColorRect" parent="." unique_id=674008506]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_ggutm")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
 [connection signal="pressed" from="VBoxContainer/panneau_bouton_menu/buttons_menu/jouer" to="." method="_on_texture_button_pressed"]
+[connection signal="pressed" from="son" to="." method="_on_sound_button_pressed"]
+[connection signal="pressed" from="quitter" to="." method="_on_quit_button_pressed"]

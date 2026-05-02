@@ -1,0 +1,177 @@
+[gd_scene format=3 uid="uid://cfworwqxamnum"]
+
+[ext_resource type="Script" uid="uid://bsgn7e4m8mn8w" path="res://script global/fin_combat.gd" id="1_hte0b"]
+[ext_resource type="FontFile" uid="uid://dr1on7k76ctm2" path="res://font/Super Smash TV.ttf" id="2_qk8eh"]
+[ext_resource type="Shader" uid="uid://2g5w3eg2s0e8" path="res://script global/menu.gdshader" id="2_yx0pa"]
+[ext_resource type="Texture2D" uid="uid://7l4rlnxy5ll1" path="res://ui_design/bg_v22_no_watermark.png" id="3_t4bgm"]
+[ext_resource type="Texture2D" uid="uid://cjyrjxg8wrdfo" path="res://ui_design/20240713dragonNeckFrame.png" id="6_62hxb"]
+[ext_resource type="Texture2D" uid="uid://bvjrsjsf3qkbt" path="res://ui_design/20240709dragonBarB.png" id="6_nxv0f"]
+[ext_resource type="Texture2D" uid="uid://c1ubo6v3j3wbm" path="res://ui_design/20240709dragonBarA.png" id="7_okknj"]
+[ext_resource type="Shader" uid="uid://4gg815xknsuj" path="res://script global/transi_g.gdshader" id="8_nxv0f"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kj6s2"]
+shader = ExtResource("2_yx0pa")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_okknj"]
+shader = ExtResource("8_nxv0f")
+shader_parameter/circle_size = 1.05
+shader_parameter/screen_width = 1153.0
+shader_parameter/screen_height = 648.0
+
+[node name="FinCombat" type="Control" unique_id=1376629149]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hte0b")
+
+[node name="fond_menu" type="TextureRect" parent="." unique_id=272247702]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_kj6s2")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_t4bgm")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=937940468]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="ScoreLabel" type="Label" parent="VBoxContainer" unique_id=226814571]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_qk8eh")
+theme_override_font_sizes/font_size = 50
+horizontal_alignment = 1
+
+[node name="IconeGagnant" type="TextureRect" parent="VBoxContainer" unique_id=468788307]
+unique_name_in_owner = true
+show_behind_parent = true
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+texture = ExtResource("6_62hxb")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="winner" type="Label" parent="VBoxContainer" unique_id=2030478658]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_qk8eh")
+theme_override_font_sizes/font_size = 50
+horizontal_alignment = 1
+
+[node name="buttons" type="VBoxContainer" parent="VBoxContainer" unique_id=586699631]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Revanche" type="TextureButton" parent="VBoxContainer/buttons" unique_id=651541386]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+texture_normal = ExtResource("6_nxv0f")
+texture_pressed = ExtResource("7_okknj")
+texture_hover = ExtResource("7_okknj")
+texture_focused = ExtResource("7_okknj")
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="VBoxContainer/buttons/Revanche" unique_id=549540271]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -11.5
+offset_right = 60.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_qk8eh")
+theme_override_font_sizes/font_size = 20
+text = "Revanche"
+horizontal_alignment = 1
+
+[node name="Nouvellepartie" type="TextureButton" parent="VBoxContainer/buttons" unique_id=2079439560]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 40)
+layout_mode = 2
+texture_normal = ExtResource("6_nxv0f")
+texture_pressed = ExtResource("7_okknj")
+texture_hover = ExtResource("7_okknj")
+texture_focused = ExtResource("7_okknj")
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="VBoxContainer/buttons/Nouvellepartie" unique_id=879292952]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -106.0
+offset_top = -11.5
+offset_right = 106.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_qk8eh")
+theme_override_font_sizes/font_size = 20
+text = "Nouvelle Partie"
+horizontal_alignment = 1
+
+[node name="Menu" type="TextureButton" parent="VBoxContainer/buttons" unique_id=1886130110]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+texture_normal = ExtResource("6_nxv0f")
+texture_pressed = ExtResource("7_okknj")
+texture_hover = ExtResource("7_okknj")
+texture_focused = ExtResource("7_okknj")
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="VBoxContainer/buttons/Menu" unique_id=2039542808]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_qk8eh")
+theme_override_font_sizes/font_size = 20
+text = "Retourner au menu"
+
+[node name="IrisTransition" type="ColorRect" parent="." unique_id=382857205]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_okknj")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[connection signal="pressed" from="VBoxContainer/buttons/Revanche" to="." method="_on_revanche_pressed"]
+[connection signal="pressed" from="VBoxContainer/buttons/Nouvellepartie" to="." method="_on_nouvelleparti_pressed"]
+[connection signal="pressed" from="VBoxContainer/buttons/Menu" to="." method="_on_menu_pressed"]

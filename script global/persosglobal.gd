@@ -3,6 +3,10 @@ extends Node
 var choix_p1 = ""
 var choix_p2 = ""
 
+var dernier_gagnant_nom : String = ""
+var score_final_p1 : int = 0
+var score_final_p2 : int = 0
+
 var liste_persos = {
 	"hecker": {
 		"scene": "res://scene_perso/Hecker.tscn",

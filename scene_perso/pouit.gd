@@ -13,6 +13,11 @@ var peut_bouger = true
 var en_parade = false 
 var en_blocage = false
 var combo_passif = 0 
+var dash_cooldown : float = 5.0
+var dash_timer : float = 0.0
+var en_dash : bool = false
+var vitesse_dash : float = 2000.0  
+var duree_dash : float = 0.15      
 
 # --- ASSETS ---
 @export var projectile_scene : PackedScene = preload("res://script_persos/projectile.tscn")
@@ -51,6 +56,9 @@ func _physics_process(delta):
 		move_and_slide()
 		return 
 
+	# 1. On gère le timer et l'input du dash
+	gerer_dash(delta)
+
 	# Gestion du blocage
 	if territory_active:
 		en_blocage = false
@@ -65,38 +73,40 @@ func _physics_process(delta):
 			en_blocage = false
 			sprite.modulate = Color(1, 1, 1, 1)
 
-	# Inputs de mouvement
-	var move_left = "gauche_" + str(player_id)
-	var move_right = "droite_" + str(player_id)
-	var move_jump = "saut_" + str(player_id)
-	var action_attaque = "attaque_" + str(player_id)
-	var action_ultime = "ultime_" + str(player_id)
+	# 2. On bloque les inputs normaux si on est en dash
+	if not en_dash:
+		# Inputs de mouvement
+		var move_left = "gauche_" + str(player_id)
+		var move_right = "droite_" + str(player_id)
+		var move_jump = "saut_" + str(player_id)
+		var action_attaque = "attaque_" + str(player_id)
+		var action_ultime = "ultime_" + str(player_id)
 
-	if Input.is_action_just_pressed(move_jump) and is_on_floor():
-		velocity.y = JUMP_VELOCITY
+		if Input.is_action_just_pressed(move_jump) and is_on_floor():
+			velocity.y = JUMP_VELOCITY
 
-	if Input.is_action_just_pressed(action_attaque) and not en_train_dattaquer:
-		frapper()
+		if Input.is_action_just_pressed(action_attaque) and not en_train_dattaquer:
+			frapper()
 
-	if Input.is_action_just_pressed(action_ultime):
-		lancer_ruee_de_becanes()
+		if Input.is_action_just_pressed(action_ultime):
+			lancer_ruee_de_becanes()
 
-	var direction = Input.get_axis(move_left, move_right)
-	if direction != 0 and not en_blocage:
-		velocity.x = direction * SPEED
-		sprite.flip_h = (direction < 0)
-		_actualiser_hitbox()
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-
-	# Gestion des animations
-	if not en_train_dattaquer:
-		if not is_on_floor():
-			sprite.play("jump") 
-		elif direction != 0:
-			sprite.play("walk")
+		var direction = Input.get_axis(move_left, move_right)
+		if direction != 0 and not en_blocage:
+			velocity.x = direction * SPEED
+			sprite.flip_h = (direction < 0)
+			_actualiser_hitbox()
 		else:
-			sprite.play("stay")
+			velocity.x = move_toward(velocity.x, 0, SPEED)
+
+		# Gestion des animations
+		if not en_train_dattaquer:
+			if not is_on_floor():
+				sprite.play("jump") 
+			elif direction != 0:
+				sprite.play("walk")
+			else:
+				sprite.play("stay")
 
 	move_and_slide()
 
@@ -171,3 +181,32 @@ func set_player_id(id):
 	player_id = id
 	if not is_node_ready(): await ready
 	appliquer_cote_initial()
+
+func gerer_dash(delta):
+	# On décrémente le timer de cooldown
+	if dash_timer > 0:
+		dash_timer -= delta
+	
+	# Détection de l'input selon l'ID du joueur
+	var action = "dash_p1" if player_id == 1 else "dash_p2"
+	
+	if Input.is_action_just_pressed(action) and dash_timer <= 0 and peut_bouger:
+		lancer_dash()
+
+func lancer_dash():
+	dash_timer = dash_cooldown
+	en_dash = true
+	
+	# On détermine la direction (basée sur le flip_h du sprite)
+	var direction = -1 if $AnimatedSprite2D.flip_h else 1
+	
+	# On applique la vitesse de dash
+	velocity.x = direction * vitesse_dash
+	
+	# Petit effet visuel : on peut changer la couleur ou l'opacité
+	modulate.a = 0.5
+	
+	# On arrête le dash après duree_dash secondes
+	await get_tree().create_timer(duree_dash).timeout
+	en_dash = false
+	modulate.a = 1.0

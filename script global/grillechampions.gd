@@ -144,7 +144,7 @@ func _changer_scene():
 	if selection_p1 and selection_p2:
 		Persosglobal.choix_p1 = selection_p1.name
 		Persosglobal.choix_p2 = selection_p2.name
-		get_tree().change_scene_to_file("res://script global/transi.tscn")
+		transition_vers_resultats_iris()
 
 func _faire_clignoter(node, actif: bool):
 	if not node: return
@@ -256,3 +256,12 @@ func filtrer_champions(type_voulu: String, bouton_clique: Button):
 			else:
 				# Cas 3 : C'est une case vide (pas dans le dico), on CACHE toujours
 				container.hide()
+
+func transition_vers_resultats_iris():
+	var iris = $%CircleTransi
+	iris.visible = true
+	iris.material.set_shader_parameter("circle_size", 1.05)
+	var tw = create_tween()
+	tw.tween_property(iris.material, "shader_parameter/circle_size", 0.0, 1.2).set_trans(Tween.TRANS_SINE)
+	await tw.finished
+	get_tree().change_scene_to_file("res://script global/transi.tscn")

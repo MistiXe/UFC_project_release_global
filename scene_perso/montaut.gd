@@ -4,11 +4,16 @@ extends CharacterBody2D
 var SPEED = 700.0
 var JUMP_VELOCITY = -1000
 var gravity = 1400.0
-var hp_max = 650
+var hp_max = 100
 var player_id = 1 
 var ulti_en_cours = false
 var est_en_train_d_aspirer = false
 var cible_ultime = null
+var dash_cooldown : float = 5.0
+var dash_timer : float = 0.0
+var en_dash : bool = false
+var vitesse_dash : float = 2000.0  # Ajustez selon la puissance voulue
+var duree_dash : float = 0.15      # Temps pendant lequel le perso fonce
 
 # --- ÉTATS ---
 var peut_bouger = true 
@@ -58,6 +63,7 @@ func _physics_process(delta):
 		sprite.play("stay")
 		move_and_slide()
 		return 
+	gerer_dash(delta)
 
 	# --- 2. LOGIQUE DE BLOCAGE & TERRITOIRE ---
 	if territory_active:
@@ -82,46 +88,47 @@ func _physics_process(delta):
 				sprite.modulate = Color(1, 1, 1, 1)
 
 	# --- 3. INPUTS DÉPLACEMENT ---
-	var move_left = "gauche_" + str(player_id)
-	var move_right = "droite_" + str(player_id)
-	var move_jump = "saut_" + str(player_id)
-	var action_attaque = "attaque_" + str(player_id)
-	var action_ultime = "ultime_" + str(player_id)
-	
-	if Input.is_action_just_pressed(action_ultime):
-		utiliser_ultime()
-	# SAUT (Avec punition Brillon)
-	if Input.is_action_just_pressed(move_jump) and is_on_floor():
+	if not en_dash:
+		var move_left = "gauche_" + str(player_id)
+		var move_right = "droite_" + str(player_id)
+		var move_jump = "saut_" + str(player_id)
+		var action_attaque = "attaque_" + str(player_id)
+		var action_ultime = "ultime_" + str(player_id)
+		
+		if Input.is_action_just_pressed(action_ultime):
+			utiliser_ultime()
+		# SAUT (Avec punition Brillon)
+		if Input.is_action_just_pressed(move_jump) and is_on_floor():
+			if territory_active:
+				velocity.y = JUMP_VELOCITY * 0.8
+				var recul = 1000.0 if not sprite.flip_h else -1000.0
+				velocity.x = -recul 
+			else:
+				velocity.y = JUMP_VELOCITY
+
+		if Input.is_action_just_pressed(action_attaque) and not en_train_dattaquer:
+			frapper()
+
+		# DÉPLACEMENT (Inversion territoire)
+		var direction = Input.get_axis(move_left, move_right)
 		if territory_active:
-			velocity.y = JUMP_VELOCITY * 0.8
-			var recul = 1000.0 if not sprite.flip_h else -1000.0
-			velocity.x = -recul 
+			direction = -direction 
+		
+		if direction != 0 and not en_blocage:
+			velocity.x = direction * SPEED
+			sprite.flip_h = (direction < 0)
+			_actualiser_hitbox()
 		else:
-			velocity.y = JUMP_VELOCITY
+			velocity.x = move_toward(velocity.x, 0, SPEED)
 
-	if Input.is_action_just_pressed(action_attaque) and not en_train_dattaquer:
-		frapper()
-
-	# DÉPLACEMENT (Inversion territoire)
-	var direction = Input.get_axis(move_left, move_right)
-	if territory_active:
-		direction = -direction 
-	
-	if direction != 0 and not en_blocage:
-		velocity.x = direction * SPEED
-		sprite.flip_h = (direction < 0)
-		_actualiser_hitbox()
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-
-	# --- 4. ANIMATIONS ---
-	if not en_train_dattaquer:
-		if not is_on_floor():
-			sprite.play("jump")
-		elif direction != 0:
-			sprite.play("walk")
-		else:
-			sprite.play("stay")
+		# --- 4. ANIMATIONS ---
+		if not en_train_dattaquer:
+			if not is_on_floor():
+				sprite.play("jump")
+			elif direction != 0:
+				sprite.play("walk")
+			else:
+				sprite.play("stay")
 
 	move_and_slide()
 	
@@ -252,3 +259,31 @@ func lancer_explosion_gradient_et_execute():
 		# On libère la cible
 		cible_ultime.peut_bouger = true
 		cible_ultime = null
+func gerer_dash(delta):
+	# On décrémente le timer de cooldown
+	if dash_timer > 0:
+		dash_timer -= delta
+	
+	# Détection de l'input selon l'ID du joueur
+	var action = "dash_p1" if player_id == 1 else "dash_p2"
+	
+	if Input.is_action_just_pressed(action) and dash_timer <= 0 and peut_bouger:
+		lancer_dash()
+
+func lancer_dash():
+	dash_timer = dash_cooldown
+	en_dash = true
+	
+	# On détermine la direction (basée sur le flip_h du sprite)
+	var direction = -1 if $AnimatedSprite2D.flip_h else 1
+	
+	# On applique la vitesse de dash
+	velocity.x = direction * vitesse_dash
+	
+	# Petit effet visuel : on peut changer la couleur ou l'opacité
+	modulate.a = 0.5
+	
+	# On arrête le dash après duree_dash secondes
+	await get_tree().create_timer(duree_dash).timeout
+	en_dash = false
+	modulate.a = 1.0

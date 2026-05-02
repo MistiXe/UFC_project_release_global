@@ -6,6 +6,11 @@ var JUMP_VELOCITY = -1000
 var gravity = 1400.0
 var hp_max = 1100
 var player_id = 1 
+var dash_cooldown : float = 5.0
+var dash_timer : float = 0.0
+var en_dash : bool = false
+var vitesse_dash : float = 2000.0  
+var duree_dash : float = 0.15      
 var en_train_dattaquer = false
 
 # --- ÉTATS & PASSIF ---
@@ -64,35 +69,37 @@ func _physics_process(delta):
 		sprite.play("stay")
 		move_and_slide()
 		return 
+	gerer_dash(delta)
+	
+	if not en_dash:
+		# --- INPUTS ---
+		var move_left = "gauche_" + str(player_id)
+		var move_right = "droite_" + str(player_id)
+		var move_jump = "saut_" + str(player_id)
+		var action_attaque = "attaque_" + str(player_id)
+		var action_ultime = "ultime_" + str(player_id)
 
-	# --- INPUTS ---
-	var move_left = "gauche_" + str(player_id)
-	var move_right = "droite_" + str(player_id)
-	var move_jump = "saut_" + str(player_id)
-	var action_attaque = "attaque_" + str(player_id)
-	var action_ultime = "ultime_" + str(player_id)
+		if Input.is_action_just_pressed(move_jump) and is_on_floor():
+			velocity.y = JUMP_VELOCITY
 
-	if Input.is_action_just_pressed(move_jump) and is_on_floor():
-		velocity.y = JUMP_VELOCITY
+		if Input.is_action_just_pressed(action_attaque) and not en_train_dattaquer:
+			frapper()
 
-	if Input.is_action_just_pressed(action_attaque) and not en_train_dattaquer:
-		frapper()
+		if Input.is_action_just_pressed(action_ultime):
+			lancer_extension_temporelle()
 
-	if Input.is_action_just_pressed(action_ultime):
-		lancer_extension_temporelle()
+		var direction = Input.get_axis(move_left, move_right)
+		if direction != 0:
+			velocity.x = direction * SPEED
+			sprite.flip_h = (direction < 0)
+			_actualiser_hitbox()
+		else:
+			velocity.x = move_toward(velocity.x, 0, SPEED)
 
-	var direction = Input.get_axis(move_left, move_right)
-	if direction != 0:
-		velocity.x = direction * SPEED
-		sprite.flip_h = (direction < 0)
-		_actualiser_hitbox()
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-
-	if not en_train_dattaquer:
-		if not is_on_floor(): sprite.play("jump") 
-		elif direction != 0: sprite.play("walk")
-		else: sprite.play("stay")
+		if not en_train_dattaquer:
+			if not is_on_floor(): sprite.play("jump") 
+			elif direction != 0: sprite.play("walk")
+			else: sprite.play("stay")
 
 	move_and_slide()
 
@@ -243,3 +250,31 @@ func perdre_temps_ultime(secondes: float):
 		# Si le temps tombe à zéro à cause du coup, l'extension s'arrête au prochain frame
 		if temps_restant_extension < 0:
 			temps_restant_extension = 0
+func gerer_dash(delta):
+	# On décrémente le timer de cooldown
+	if dash_timer > 0:
+		dash_timer -= delta
+	
+	# Détection de l'input selon l'ID du joueur
+	var action = "dash_p1" if player_id == 1 else "dash_p2"
+	
+	if Input.is_action_just_pressed(action) and dash_timer <= 0 and peut_bouger:
+		lancer_dash()
+
+func lancer_dash():
+	dash_timer = dash_cooldown
+	en_dash = true
+	
+	# On détermine la direction (basée sur le flip_h du sprite)
+	var direction = -1 if $AnimatedSprite2D.flip_h else 1
+	
+	# On applique la vitesse de dash
+	velocity.x = direction * vitesse_dash
+	
+	# Petit effet visuel : on peut changer la couleur ou l'opacité
+	modulate.a = 0.5
+	
+	# On arrête le dash après duree_dash secondes
+	await get_tree().create_timer(duree_dash).timeout
+	en_dash = false
+	modulate.a = 1.0

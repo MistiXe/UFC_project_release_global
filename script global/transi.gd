@@ -26,4 +26,5 @@ func _process(delta: float) -> void:
 		# On arrête le process pour éviter de charger 50 fois
 		set_process(false) 
 		# ENFIN, on lance le combat
+		
 		get_tree().change_scene_to_file("res://script global/gameplay.tscn")

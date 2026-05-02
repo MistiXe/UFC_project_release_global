@@ -17,6 +17,12 @@ extends Control
 @onready var portrait_ui_p2 = %portrait_p2
 
 # --- VARIABLES ---
+var rounds_p1 = 0
+var rounds_p2 = 0
+const ROUNDS_POUR_GAGNER = 2
+var dernier_gagnant_nom = ""
+var score_final_p1 = 0
+var score_final_p2 = 0
 var hp_p1 = 450
 var hp_p2 = 450
 var energie_p1 = 0	
@@ -36,7 +42,7 @@ var video_brillon = preload("res://persos/brillon/bg_ult_brillon.ogv")
 var video_dallaporta = preload("res://song/cyberpunk-rain-city-pixel-moewalls-com.ogv")
 func _ready():
 	# On fixe le zoom une fois pour toutes pour éviter les décalages
-	
+	reouvrir_iris()
 	splash_art.modulate.a = 0
 	if has_node("%VideoStreamPlayer"):
 		%VideoStreamPlayer.play()
@@ -69,14 +75,19 @@ func _process(delta):
 		
 		mettre_a_jour_ui()
 		
-		
+
+func _input(event):
+	if Input.is_action_just_pressed("ui_cancel"): # Touche Echap par défaut
+		toggle_pause()
 
 # --- GESTION DES JOUEURS ---
 func spawn_joueurs():
 	# --- JOUEUR 1 ---
+	
 	var p1_res = Persosglobal.liste_persos[Persosglobal.choix_p1]
 	var p1_instance = load(p1_res["scene"]).instantiate()
 	p1_instance.name = "p1"
+	p1_instance.peut_bouger = false
 	add_child(p1_instance)
 	
 	# Synchronisation des stats et UI pour P1
@@ -98,6 +109,7 @@ func spawn_joueurs():
 	var p2_res = Persosglobal.liste_persos[Persosglobal.choix_p2]
 	var p2_instance = load(p2_res["scene"]).instantiate()
 	p2_instance.name = "p2"
+	p2_instance.peut_bouger = false
 	add_child(p2_instance)
 	
 	# Synchronisation des stats et UI pour P2
@@ -232,7 +244,7 @@ func update_triple_bar(container, valeur, p_id):
 
 # --- CINÉMATIQUES & CAMERA ---
 func zoom_cinematique(cible):
-	combat_actif = false 
+	#combat_actif = false 
 	var adversaire = $p2 if cible.name == "p1" else $p1
 	adversaire.visible = false 
 	if has_node("MonDecor"):
@@ -286,19 +298,49 @@ func demarrer_sequence_intro():
 		label_countdown.visible = false
 
 func demarrer_chrono():
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(1.0, false).timeout
 	if combat_actif and temps > 0:
 		temps -= 1
 		chrono.text = str(temps)
-	if temps > 0: 
-		demarrer_chrono()
+		
+		if temps <= 0:
+			timer_termine_decision_hp() # On appelle la décision par HP
+		else:
+			demarrer_chrono()
 		
 
 func verifier_mort():
+	if not combat_actif: 
+		return	
 	if hp_p1 <= 0 or hp_p2 <= 0:
 		combat_actif = false
-		label_countdown.text = "K.O. !"
+		
+		# Effet de ralenti (Slow Motion)
+		Engine.time_scale = 0.2 # Le jeu tourne à 20% de sa vitesse
+		
+		# On attend un peu (en temps réel, donc on utilise un timer spécial)
+		await get_tree().create_timer(1.5 * Engine.time_scale).timeout
+		
+		# On remet la vitesse normale
+		Engine.time_scale = 1.0
+		
+		# 1. Attribution du point
+		if hp_p1 <= 0:
+			rounds_p2 += 1
+			label_countdown.text = "ROUND JOUEUR 2 !"
+		else:
+			rounds_p1 += 1
+			label_countdown.text = "ROUND JOUEUR 1 !"
+		
 		label_countdown.visible = true
+		print("Score actuel : P1: ", rounds_p1, " | P2: ", rounds_p2)
+
+		# 2. Vérification de la victoire finale
+		if rounds_p1 >= ROUNDS_POUR_GAGNER or rounds_p2 >= ROUNDS_POUR_GAGNER:
+			afficher_ecran_fin_match()
+		else:
+			# 3. On attend un peu et on relance le round suivant
+			get_tree().create_timer(2.0).timeout.connect(preparer_round_suivant)
 
 # --- AUDIO & INPUT ---
 func gerer_musique_combat(actif: bool):
@@ -395,3 +437,124 @@ func fin_extension_visuelle():
 		vsp.play()
 	
 	print("Retour au monde normal")
+
+func toggle_pause():
+	# 1. On inverse l'état de pause global
+	var current_state = get_tree().paused
+	get_tree().paused = !current_state
+	
+	# 2. On synchronise le menu avec cet état
+	var pause_menu = $%menu
+	pause_menu.visible = !current_state
+
+	if !current_state: # Si on vient de mettre en pause
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	else: # Si on reprend le jeu
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _on_resume_button_pressed():
+	get_tree().paused = false      # Relance le temps
+	$%menu.visible = false     # Cache le menu
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED # Cache la souris
+	
+func _on_btn_lobby_pressed():
+	get_tree().paused = false # TRÈS IMPORTANT : Relancer le temps avant de changer de scène
+	get_tree().change_scene_to_file("res://script global/champselect.tscn")
+
+
+func preparer_round_suivant():
+	# 1. Reset des HP
+	hp_p1 = $p1.hp_max
+	hp_p2 = $p2.hp_max
+	
+	# 2. RESET DE L'ÉNERGIE (Nouveau)
+	energie_p1 = 0
+	energie_p2 = 0
+	
+	# 3. Nettoyage des effets visuels d'ultime
+	if has_node("p1"): appliquer_visuel_ulti_utilise(icon_ulti_p1)
+	if has_node("p2"): appliquer_visuel_ulti_utilise(icon_ulti_p2)
+	
+	# On arrête les effets visuels (vidéo, tremblements)
+	fin_extension_visuelle()
+	
+	# On replace les joueurs aux spawns
+	$p1.global_position = %spawnJ1.global_position
+	$p2.global_position = %spawnJ2.global_position
+	
+	# 4. Mise à jour de l'UI pour refléter le reset
+	mettre_a_jour_ui()
+	
+	# Reset du chrono et relance de la séquence
+	temps = 180
+	chrono.text = str(temps)
+	compte_a_rebours = 3
+	demarrer_sequence_intro()
+
+func afficher_ecran_fin_match():
+	# 1. Sauvegarder les résultats dans le script Global
+	if rounds_p1 >= 2:
+		Persosglobal.dernier_gagnant_nom = Persosglobal.liste_persos[Persosglobal.choix_p1]["nom"]
+	else:
+		Persosglobal.dernier_gagnant_nom = Persosglobal.liste_persos[Persosglobal.choix_p2]["nom"]
+
+	Persosglobal.score_final_p1 = rounds_p1
+	Persosglobal.score_final_p2 = rounds_p2
+
+	# 2. S'assurer que le temps n'est pas figé avant de partir
+	Engine.time_scale = 1.0
+	get_tree().paused = false
+	# 3. Changer totalement de scène
+	transition_vers_resultats_iris()
+	
+	
+func timer_termine_decision_hp():
+	combat_actif = false
+	
+	# Calcul du pourcentage de vie restante (0.0 à 1.0)
+	var ratio_p1 = float(hp_p1) / float($p1.hp_max)
+	var ratio_p2 = float(hp_p2) / float($p2.hp_max)
+	
+	if ratio_p1 > ratio_p2:
+		# P1 a un meilleur pourcentage, il gagne le round
+		rounds_p1 += 1
+		label_countdown.text = "J1 GAGNE AU HP !"
+	elif ratio_p2 > ratio_p1:
+		# P2 a un meilleur pourcentage
+		rounds_p2 += 1
+		label_countdown.text = "J2 GAGNE AU HP !"
+	else:
+		# Égalité parfaite
+		label_countdown.text = "ÉGALITÉ !"
+	
+	label_countdown.visible = true
+	
+	# On attend 2 secondes et on vérifie si quelqu'un a gagné le match
+	await get_tree().create_timer(2.0).timeout
+	if rounds_p1 >= ROUNDS_POUR_GAGNER or rounds_p2 >= ROUNDS_POUR_GAGNER:
+		afficher_ecran_fin_match()
+	else:
+		preparer_round_suivant()
+
+func transition_vers_resultats_iris():
+	var iris = $%IrisTransition
+	iris.visible = true
+	iris.material.set_shader_parameter("circle_size", 1.05)
+	var tw = create_tween()
+	tw.tween_property(iris.material, "shader_parameter/circle_size", 0.0, 1.2).set_trans(Tween.TRANS_SINE)
+	await tw.finished
+	get_tree().change_scene_to_file("res://script global/fin_combat.tscn")
+
+func reouvrir_iris():
+	var iris = $%TransiOut
+	iris.visible = true
+
+	# On part de 0 (tout noir)
+	iris.material.set_shader_parameter("circle_size", 0.0)
+
+	var tw = create_tween()
+	# On ouvre vers 1.05 (tout visible)
+	tw.tween_property(iris.material, "shader_parameter/circle_size", 1.05, 1.0).set_trans(Tween.TRANS_SINE)
+
+	# Une fois fini, on peut cacher le nœud pour économiser de la ressource
+	tw.finished.connect(func(): iris.visible = false);

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://df6yyq3n6odrg"]
 
 [ext_resource type="Script" uid="uid://dxvapg6lui5nq" path="res://script global/transi.gd" id="1_6866b"]
-[ext_resource type="FontFile" uid="uid://dxixa5qwp5b6w" path="res://font/Super Smash TV.ttf" id="1_gtvbn"]
+[ext_resource type="FontFile" uid="uid://dr1on7k76ctm2" path="res://font/Super Smash TV.ttf" id="1_gtvbn"]
 
 [node name="Control" type="Control" unique_id=1656305082]
 layout_mode = 3

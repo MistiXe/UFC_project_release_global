@@ -9,6 +9,7 @@
 [ext_resource type="Shader" uid="uid://cgm4f4dn54xqa" path="res://script global/rond_ult.gdshader" id="7_e8ab0"]
 [ext_resource type="AudioStream" uid="uid://bfuprgi54cy73" path="res://song/musique_combat.mp3" id="8_0m7cd"]
 [ext_resource type="Texture2D" uid="uid://bycnrkibrpvi2" path="res://ui_design/vrai_image3.png" id="8_1qy1k"]
+[ext_resource type="Shader" uid="uid://4gg815xknsuj" path="res://script global/transi_g.gdshader" id="9_5wd02"]
 [ext_resource type="Texture2D" uid="uid://djvq7d8hmkjyn" path="res://ui_design/tilemap_packed.png" id="10_5xop4"]
 [ext_resource type="VideoStream" uid="uid://bp8ruwixnw74v" path="res://ui_design/fond-animé_1.ogv" id="11_3n40r"]
 
@@ -75,6 +76,18 @@ corner_radius_bottom_left = 100
 resource_local_to_scene = true
 shader = ExtResource("7_e8ab0")
 shader_parameter/pulse_weight = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dwrqy"]
+shader = ExtResource("9_5wd02")
+shader_parameter/circle_size = 1.05
+shader_parameter/screen_width = 1153.0
+shader_parameter/screen_height = 648.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5wd02"]
+shader = ExtResource("9_5wd02")
+shader_parameter/circle_size = 1.05
+shader_parameter/screen_width = 1153.0
+shader_parameter/screen_height = 648.0
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_45aep"]
 particle_flag_disable_z = true
@@ -612,7 +625,6 @@ theme_override_constants/separation = 20
 
 [node name="portrait_p1" type="TextureRect" parent="CanvasLayer/barredevie/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer" unique_id=1780834597]
 unique_name_in_owner = true
-z_index = 1
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 size_flags_horizontal = 8
@@ -784,7 +796,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("5_0m7cd")
 theme_override_font_sizes/font_size = 60
-text = "190"
 horizontal_alignment = 1
 
 [node name="menu" type="ColorRect" parent="CanvasLayer" unique_id=183663539]
@@ -857,6 +868,28 @@ grow_horizontal = 2
 grow_vertical = 2
 expand_mode = 1
 
+[node name="IrisTransition" type="ColorRect" parent="CanvasLayer" unique_id=199689249]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_dwrqy")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="TransiOut" type="ColorRect" parent="CanvasLayer" unique_id=1040643901]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_5wd02")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
 [node name="GPUParticles2D" type="GPUParticles2D" parent="." unique_id=108255031]
 position = Vector2(903, 356)
 amount = 40
@@ -916,5 +949,5 @@ scale = Vector2(2, 2)
 shape = SubResource("RectangleShape2D_3n40r")
 debug_color = Color(2.4065375e-07, 0.2948166, 0.34927088, 0.41960785)
 
-[connection signal="pressed" from="CanvasLayer/menu/VBoxContainer/reprendre" to="CanvasLayer" method="_on_pause_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/menu/VBoxContainer/menu2" to="CanvasLayer" method="_on_bouton_quitter_pressed"]
+[connection signal="pressed" from="CanvasLayer/menu/VBoxContainer/reprendre" to="." method="_on_resume_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/menu/VBoxContainer/menu2" to="." method="_on_btn_lobby_pressed"]

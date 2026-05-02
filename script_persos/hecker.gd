@@ -20,6 +20,11 @@ var timer_blocage = 0.0
 var extension_active = false
 var temps_restant_extension = 0.0
 var bonus_degats_temporel = 0.0 
+var dash_cooldown : float = 5.0
+var dash_timer : float = 0.0
+var en_dash : bool = false
+var vitesse_dash : float = 2000.0  # Ajustez selon la puissance voulue
+var duree_dash : float = 0.15      # Temps pendant lequel le perso fonce
 
 # --- ASSETS ---
 var icone_ultime = preload("res://persos/hecker/assets_hecker/Vol ancestral.png")
@@ -74,7 +79,7 @@ func _physics_process(delta):
 		_actualiser_hitbox()
 		move_and_slide()
 		return 
-
+	gerer_dash(delta)
 	# --- 2. LOGIQUE DE BLOCAGE (TERRITOIRE) ---
 	if territory_active:
 		en_blocage = false
@@ -94,74 +99,75 @@ func _physics_process(delta):
 			en_blocage = false
 			timer_blocage = 0.0
 			if not en_parade: sprite.modulate = Color(1, 1, 1, 1)
+			
+	if not en_dash:
+		# --- 3. INPUTS & TERRITOIRE ---
+		var move_left = "gauche_" + str(player_id)
+		var move_right = "droite_" + str(player_id)
+		var move_jump = "saut_" + str(player_id)
+		var action_attaque = "attaque_" + str(player_id)
+		var action_ultime = "ultime_" + str(player_id)
 
-	# --- 3. INPUTS & TERRITOIRE ---
-	var move_left = "gauche_" + str(player_id)
-	var move_right = "droite_" + str(player_id)
-	var move_jump = "saut_" + str(player_id)
-	var action_attaque = "attaque_" + str(player_id)
-	var action_ultime = "ultime_" + str(player_id)
+		# SAUT (Inversion territoire)
+		if Input.is_action_just_pressed(move_jump) and is_on_floor():
+			if territory_active:
+				velocity.y = JUMP_VELOCITY * 0.8
+				var recul = 1000.0 if not sprite.flip_h else -1000.0
+				velocity.x = -recul 
+			else:
+				velocity.y = JUMP_VELOCITY
 
-	# SAUT (Inversion territoire)
-	if Input.is_action_just_pressed(move_jump) and is_on_floor():
+		if Input.is_action_just_pressed(action_ultime):
+			if ultime_vole == null: phase_vol_ancestral()
+			else: utiliser_ultime_vole()
+
+		if Input.is_action_just_pressed(action_attaque):
+			frapper()
+		
+		if extension_active:
+			temps_restant_extension -= delta
+			# Calcul du bonus (même si on l'utilise différemment, ça sert de timer)
+			bonus_degats_temporel = (30.0 - temps_restant_extension) * 3.0
+			
+			if temps_restant_extension <= 0:
+				fin_extension() # La fonction qui remet la vitesse normale et le décor
+
+		# DÉPLACEMENT (Inversion territoire)
+		var direction = Input.get_axis(move_left, move_right)
 		if territory_active:
-			velocity.y = JUMP_VELOCITY * 0.8
-			var recul = 1000.0 if not sprite.flip_h else -1000.0
-			velocity.x = -recul 
+			direction = -direction 
+		
+		if direction != 0:
+			velocity.x = direction * SPEED
+			sprite.flip_h = (direction < 0)
+			_actualiser_hitbox()
 		else:
-			velocity.y = JUMP_VELOCITY
+			velocity.x = move_toward(velocity.x, 0, SPEED)
 
-	if Input.is_action_just_pressed(action_ultime):
-		if ultime_vole == null: phase_vol_ancestral()
-		else: utiliser_ultime_vole()
-
-	if Input.is_action_just_pressed(action_attaque):
-		frapper()
-	
-	if extension_active:
-		temps_restant_extension -= delta
-		# Calcul du bonus (même si on l'utilise différemment, ça sert de timer)
-		bonus_degats_temporel = (30.0 - temps_restant_extension) * 3.0
-		
-		if temps_restant_extension <= 0:
-			fin_extension() # La fonction qui remet la vitesse normale et le décor
-
-	# DÉPLACEMENT (Inversion territoire)
-	var direction = Input.get_axis(move_left, move_right)
-	if territory_active:
-		direction = -direction 
-	
-	if direction != 0:
-		velocity.x = direction * SPEED
-		sprite.flip_h = (direction < 0)
-		_actualiser_hitbox()
-	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-
-	# --- 4. GESTION DES ANIMATIONS (ANTI-ÉCRASEMENT) ---
-	if not en_train_dattaquer:
-		if not is_on_floor():
-			sprite.play("jump")
-		elif direction != 0:
-			sprite.play("walk")
-		else:
-			sprite.play("stay")
-	if est_en_train_d_aspirer and is_instance_valid(cible_ultime):
-		# 1. Calcul du vecteur de direction vers Hecker
-		var direction_gradient = (global_position - cible_ultime.global_position).normalized()
-		
-		# 2. Calcul de la distance
-		var distance = global_position.distance_to(cible_ultime.global_position)
-		
-		# 3. Calcul de la force (le fameux "Gradient")
-		# Plus la cible est loin, plus elle est aspirée fort
-		var force_attraction = clamp(distance * 5.0, 500.0, 3000.0)
-		
-		# 4. On applique la vélocité directement sur la cible
-		cible_ultime.velocity.x = direction_gradient.x * force_attraction
-		
-		# 5. On force la cible à bouger (car son propre physics_process est souvent bloqué par peut_bouger = false)
-		cible_ultime.move_and_slide()
+		# --- 4. GESTION DES ANIMATIONS (ANTI-ÉCRASEMENT) ---
+		if not en_train_dattaquer:
+			if not is_on_floor():
+				sprite.play("jump")
+			elif direction != 0:
+				sprite.play("walk")
+			else:
+				sprite.play("stay")
+		if est_en_train_d_aspirer and is_instance_valid(cible_ultime):
+			# 1. Calcul du vecteur de direction vers Hecker
+			var direction_gradient = (global_position - cible_ultime.global_position).normalized()
+			
+			# 2. Calcul de la distance
+			var distance = global_position.distance_to(cible_ultime.global_position)
+			
+			# 3. Calcul de la force (le fameux "Gradient")
+			# Plus la cible est loin, plus elle est aspirée fort
+			var force_attraction = clamp(distance * 5.0, 500.0, 3000.0)
+			
+			# 4. On applique la vélocité directement sur la cible
+			cible_ultime.velocity.x = direction_gradient.x * force_attraction
+			
+			# 5. On force la cible à bouger (car son propre physics_process est souvent bloqué par peut_bouger = false)
+			cible_ultime.move_and_slide()
 	move_and_slide()
 func frapper():
 	en_train_dattaquer = true
@@ -558,3 +564,32 @@ func _gestion_extension_temps_copie(delta):
 	if temps_restant_extension <= 0:
 		temps_restant_extension = 0
 		fin_extension() # Appelle ta fonction qui reset tout
+
+func gerer_dash(delta):
+	# On décrémente le timer de cooldown
+	if dash_timer > 0:
+		dash_timer -= delta
+	
+	# Détection de l'input selon l'ID du joueur
+	var action = "dash_p1" if player_id == 1 else "dash_p2"
+	
+	if Input.is_action_just_pressed(action) and dash_timer <= 0 and peut_bouger:
+		lancer_dash()
+
+func lancer_dash():
+	dash_timer = dash_cooldown
+	en_dash = true
+	
+	# On détermine la direction (basée sur le flip_h du sprite)
+	var direction = -1 if $AnimatedSprite2D.flip_h else 1
+	
+	# On applique la vitesse de dash
+	velocity.x = direction * vitesse_dash
+	
+	# Petit effet visuel : on peut changer la couleur ou l'opacité
+	modulate.a = 0.5
+	
+	# On arrête le dash après duree_dash secondes
+	await get_tree().create_timer(duree_dash).timeout
+	en_dash = false
+	modulate.a = 1.0
