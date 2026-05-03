@@ -5,3 +5,6 @@
 # Fichiers de configuration utilisateur
 export_preset.cfg
 .mono/
+launch/Champollion_fighter.console.exe
+launch/Champollion_fighter.exe
+launch/Champollion_fighter_v0.7.1.console.exe
