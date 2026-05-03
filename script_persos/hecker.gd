@@ -42,7 +42,7 @@ var ost_ultime = preload("res://song/Voleur de Sorts_hecker_theme.mp3")
 @export var becane_scene : PackedScene = preload("res://script_persos/becane_objet.tscn") # À charger avec ton fichier moto.tscn
 
 #@onready var particules = $ParticulesGradient
-var liste_personnages = ["Dallaporta"]
+var liste_personnages = ["Dallaporta", "Pouit","Brillon","Montaut","Alexis", "Garric"]
 
 var ultime_vole = null          
 var icone_origine = preload("res://persos/hecker/assets_hecker/Vol ancestral.png")
@@ -94,6 +94,7 @@ func _physics_process(delta):
 			sprite.modulate = Color(0.5, 0.5, 0.5, 0.5) 
 			if timer_blocage >= 0.5:
 				en_blocage = true
+				AudioManager.play("bloc", global_position)
 				sprite.modulate = Color(0.1, 0.1, 0.1, 0.5)
 		else:
 			en_blocage = false
@@ -172,6 +173,7 @@ func _physics_process(delta):
 func frapper():
 	en_train_dattaquer = true
 	anim_player.play("attaque")
+	AudioManager.play("attaque", global_position)
 	await anim_player.animation_finished
 	en_train_dattaquer = false
 
@@ -579,7 +581,7 @@ func gerer_dash(delta):
 func lancer_dash():
 	dash_timer = dash_cooldown
 	en_dash = true
-	
+	AudioManager.play("dash", global_position)
 	# On détermine la direction (basée sur le flip_h du sprite)
 	var direction = -1 if $AnimatedSprite2D.flip_h else 1
 	

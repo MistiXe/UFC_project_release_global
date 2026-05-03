@@ -81,6 +81,7 @@ func _physics_process(delta):
 			sprite.modulate = Color(0.5, 0.5, 0.5, 0.5) 
 			if timer_blocage >= 0.5:
 				en_blocage = true
+				AudioManager.play("bloc", global_position)
 				sprite.modulate = Color(0.1, 0.1, 0.1, 0.5)
 		else:
 			en_blocage = false
@@ -221,8 +222,10 @@ func lancer_lecon_particuliere():
 		print("Pas assez d'énergie pour la leçon !")
 
 func frapper():
+	
 	en_train_dattaquer = true
 	anim_player.play("attaque")
+	AudioManager.play("attaque", global_position)
 	await anim_player.animation_finished
 	en_train_dattaquer = false
 
@@ -250,6 +253,7 @@ func gerer_dash(delta):
 func lancer_dash():
 	dash_timer = dash_cooldown
 	en_dash = true
+	AudioManager.play("dash", global_position)
 	
 	# On détermine la direction (basée sur le flip_h du sprite)
 	var direction = -1 if $AnimatedSprite2D.flip_h else 1

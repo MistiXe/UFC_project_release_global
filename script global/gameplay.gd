@@ -200,6 +200,7 @@ func feedback_ulti_pret(p_id):
 	tw.finished.connect(func(): label_ulti.queue_free())
 
 func appliquer_visuel_ulti_pret(icone):
+	AudioManager.play("energie", global_position)
 	if icone.has_meta("flash_tween"):
 		var old_tw = icone.get_meta("flash_tween")
 		if old_tw: old_tw.kill()
@@ -439,6 +440,7 @@ func fin_extension_visuelle():
 	print("Retour au monde normal")
 
 func toggle_pause():
+	AudioManager.play("clique", global_position)
 	# 1. On inverse l'état de pause global
 	var current_state = get_tree().paused
 	get_tree().paused = !current_state
@@ -456,10 +458,14 @@ func _on_resume_button_pressed():
 	get_tree().paused = false      # Relance le temps
 	$%menu.visible = false     # Cache le menu
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED # Cache la souris
-	
-func _on_btn_lobby_pressed():
+
+func _on_retour_lobby_pressed():
 	get_tree().paused = false # TRÈS IMPORTANT : Relancer le temps avant de changer de scène
 	get_tree().change_scene_to_file("res://script global/champselect.tscn")
+
+func _on_btn_lobby_pressed():
+	get_tree().paused = false # TRÈS IMPORTANT : Relancer le temps avant de changer de scène
+	get_tree().change_scene_to_file("res://script global/menu.tscn")
 
 
 func preparer_round_suivant():

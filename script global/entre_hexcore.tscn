@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://dimrtgu2x1ire"]
+
+[ext_resource type="Script" uid="uid://dm7e4vh8cudle" path="res://script global/entre_hexcore.gd" id="1_7lbgt"]
+[ext_resource type="FontFile" uid="uid://dr1on7k76ctm2" path="res://font/Super Smash TV.ttf" id="2_obdlv"]
+[ext_resource type="AudioStream" uid="uid://b0i1fhq6muytu" path="res://song/intro.wav" id="3_yi70r"]
+
+[node name="EntreHexcore" type="Control" unique_id=1656468040]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7lbgt")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=47984517]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="hex" type="RichTextLabel" parent="." unique_id=1350826907]
+unique_name_in_owner = true
+clip_contents = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.75
+offset_top = -38.5
+offset_right = 220.75
+offset_bottom = 38.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/normal_font = ExtResource("2_obdlv")
+theme_override_font_sizes/normal_font_size = 100
+bbcode_enabled = true
+text = "[center][wave amp=60.0 freq=6.0 connected=1]HEXACORE[/wave][/center]"
+
+[node name="SfxIntro" type="AudioStreamPlayer" parent="." unique_id=1655109266]
+unique_name_in_owner = true
+stream = ExtResource("3_yi70r")

@@ -1,0 +1,136 @@
+[gd_scene format=3 uid="uid://bc7jbuf0rc0lm"]
+
+[ext_resource type="Script" uid="uid://bmhfa7ykpmsg4" path="res://script global/tutoriel.gd" id="1_4b202"]
+[ext_resource type="Shader" uid="uid://2g5w3eg2s0e8" path="res://script global/menu.gdshader" id="1_adk4s"]
+[ext_resource type="FontFile" uid="uid://dr1on7k76ctm2" path="res://font/Super Smash TV.ttf" id="3_4b202"]
+[ext_resource type="Texture2D" uid="uid://7l4rlnxy5ll1" path="res://ui_design/bg_v22_no_watermark.png" id="3_hwjca"]
+[ext_resource type="AudioStream" uid="uid://bnh7bvwbvkfhn" path="res://song/Pressure Bloom.mp3" id="5_7u36x"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hwjca"]
+shader = ExtResource("1_adk4s")
+
+[node name="Tutoriel" type="Control" unique_id=354955415]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4b202")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1641129372]
+material = SubResource("ShaderMaterial_hwjca")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_hwjca")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Label" type="Label" parent="." unique_id=2106812397]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -155.0
+offset_top = 20.0
+offset_right = 155.0
+offset_bottom = 70.0
+grow_horizontal = 2
+theme_override_fonts/font = ExtResource("3_4b202")
+theme_override_font_sizes/font_size = 80
+text = "Tutoriel"
+
+[node name="AfficheImage" type="TextureRect" parent="." unique_id=2058089327]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(700, 400)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+
+[node name="gauche" type="Button" parent="." unique_id=432971004]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 300.0
+offset_top = -78.0
+offset_right = 350.0
+offset_bottom = -28.0
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_4b202")
+theme_override_font_sizes/font_size = 30
+text = "<"
+
+[node name="LabelPage" type="Label" parent="." unique_id=394151525]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -78.0
+offset_right = 20.0
+offset_bottom = -55.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="droite" type="Button" parent="." unique_id=208381486]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -353.0
+offset_top = -78.0
+offset_right = -303.0
+offset_bottom = -28.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_4b202")
+theme_override_font_sizes/font_size = 30
+text = ">"
+
+[node name="Button" type="Button" parent="." unique_id=1587184992]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -108.0
+offset_top = -37.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("3_4b202")
+theme_override_font_sizes/font_size = 30
+text = "Retour"
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=1773761225]
+stream = ExtResource("5_7u36x")
+autoplay = true
+parameters/looping = true
+
+[connection signal="pressed" from="gauche" to="." method="_on_btn_gauche_pressed"]
+[connection signal="pressed" from="droite" to="." method="_on_btn_droite_pressed"]
+[connection signal="pressed" from="Button" to="." method="_on_btn_quitter_pressed"]

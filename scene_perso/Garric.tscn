@@ -372,13 +372,13 @@ animation = &"ulti"
 autoplay = "stay"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=713878182]
-position = Vector2(107, 250.125)
+position = Vector2(101, 220)
 shape = SubResource("RectangleShape2D_6dodl")
 
 [node name="HurtBox" type="Area2D" parent="." unique_id=1648592449]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox" unique_id=562012763]
-position = Vector2(106.625, 261.5)
+position = Vector2(102, 239)
 shape = SubResource("RectangleShape2D_3n70h")
 
 [node name="HitboxPoing" type="Area2D" parent="." unique_id=1910414109]

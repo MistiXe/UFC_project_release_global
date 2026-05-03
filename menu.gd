@@ -8,6 +8,7 @@ func _ready() -> void:
 
 
 func _on_texture_button_pressed():
+	AudioManager.play("clique", global_position)
 	# La fonction pour aller à la sélection de champions
 	var water = $%WaterTransition
 	water.visible = true
@@ -43,3 +44,7 @@ func _on_sound_button_pressed():
 	else:
 		print("Son activé")
 		$son.texture_normal = load("res://ui_design/20240707dragon9SlicesD.png")
+
+func _on_tutoriel_pressed():
+	# On change de scène vers le tuto
+	get_tree().change_scene_to_file("res://script global/Tutoriel.tscn")

@@ -11,14 +11,15 @@ config_version=5
 [application]
 
 config/name="champollion_fighter"
-config/version="0.2"
-run/main_scene="uid://cb8ycyapdslh0"
+config/version="0.7"
+run/main_scene="uid://dimrtgu2x1ire"
 config/features=PackedStringArray("4.6", "GL Compatibility")
-config/icon="uid://dxc6q0vbxgpjm"
+config/icon="uid://b1kfpxcdubjad"
 
 [autoload]
 
 Persosglobal="*uid://e2cb0emhdmrg"
+AudioManager="*uid://0bdi40qob8m1"
 
 [display]
 

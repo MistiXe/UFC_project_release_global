@@ -6,6 +6,7 @@ var etat_actuel = Etat.J1_CHOISIT
 var bouton_selectionne = null
 var selection_p1 = null
 var selection_p2 = null
+var timer_description : SceneTreeTimer = null
 var temps_restant = 5
 
 @onready var titre_haut = %titre_haut
@@ -48,12 +49,14 @@ func _ready():
 	_maj_compte_champions()
 
 func _on_champion_clicked(bouton):
+	AudioManager.play("clique", global_position)
 	if bouton.disabled: return 
 	
 	bouton_selectionne = bouton
 	
 	if etat_actuel == Etat.J1_CHOISIT or etat_actuel == Etat.J1_CONFIRME:
 		if portrait_p1:
+			
 			portrait_p1.texture = bouton.icon
 			portrait_p1.modulate = Color(1, 1, 1, 1) # Force la luminosité
 			_anime_portrait_zoom(portrait_p1)
@@ -65,6 +68,7 @@ func _on_champion_clicked(bouton):
 		if bouton == selection_p1: return 
 		
 		if portrait_p2:
+			
 			portrait_p2.texture = bouton.icon
 			portrait_p2.modulate = Color(1, 1, 1, 1) # Force la luminosité
 			_anime_portrait_zoom(portrait_p2)
@@ -90,6 +94,7 @@ func valider_selection():
 	if etat_actuel == Etat.J1_CONFIRME:
 		selection_p1 = bouton_selectionne
 		barrer_champion(selection_p1)
+		AudioManager.play("lock", global_position)
 		
 		# --- AJOUT ICI ---
 		_maj_compte_champions() 
@@ -103,6 +108,7 @@ func valider_selection():
 	elif etat_actuel == Etat.J2_CONFIRME:
 		selection_p2 = bouton_selectionne
 		barrer_champion(selection_p2)
+		AudioManager.play("lock", global_position)
 		
 		# --- AJOUT ICI ---
 		_maj_compte_champions()
@@ -162,29 +168,36 @@ func _faire_clignoter(node, actif: bool):
 
 
 func _on_champion_hold_start(bouton):
-	print("c'est maintenu")
+	# On crée un timer de 3 secondes
+	timer_description = get_tree().create_timer(1.0)
+	
+	# On attend que le timer finisse
+	await timer_description.timeout
+	
+	# Vérification : si le timer est toujours valide (pas annulé par un relâchement)
+	# et que la souris est toujours sur le bouton
+	if timer_description != null:
+		_afficher_popup_description(bouton)
+
+func _afficher_popup_description(bouton):
 	var nom = bouton.name.to_lower()
 	if Persosglobal.liste_persos.has(nom):
 		var data = Persosglobal.liste_persos[nom]
 		
-		# On remplit le texte
 		var texte = "[center][b][font_size=30]" + nom.to_upper() + "[/font_size][/b][/center]\n"
-		#texte += "[center][color=gray]" + data["type"] + "[/color][/center]\n\n"
-		#texte += data["description"] + "\n\n"
-		#texte += "[color=yellow]" + data["stats"] + "[/color]"
+		texte += "[center][color=gray]" + data["type"] + "[/color][/center]\n\n"
+		texte += data["description"] + "\n\n"
+		texte += data["ultime"] + "\n\n"
 		
 		%label_info.text = texte
-		
-		# On affiche la popup
 		%PopupInfo.show()
 		
-		# Petit effet de zoom pour l'apparition
 		%PopupInfo.scale = Vector2(0.5, 0.5)
 		%PopupInfo.pivot_offset = %PopupInfo.size / 2
 		var tw = create_tween()
 		tw.tween_property(%PopupInfo, "scale", Vector2(1.0, 1.0), 0.2).set_trans(Tween.TRANS_BACK)
-
 func _on_champion_hold_end():
+	timer_description = null
 	%PopupInfo.hide()
 
 

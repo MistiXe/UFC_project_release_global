@@ -159,7 +159,7 @@ func frapper():
 	# Attaquer brise l'invisibilité
 	if est_invisible: 
 		_revenir_visible()
-	
+	AudioManager.play("attaque", global_position)
 	en_train_dattaquer = true
 	anim_player.play("attaque")
 	await anim_player.animation_finished
@@ -264,7 +264,7 @@ func gerer_dash(delta):
 func lancer_dash():
 	dash_timer = dash_cooldown
 	en_dash = true
-	
+	AudioManager.play("dash", global_position)
 	# On détermine la direction (basée sur le flip_h du sprite)
 	var direction = -1 if $AnimatedSprite2D.flip_h else 1
 	

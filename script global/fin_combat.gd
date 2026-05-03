@@ -1,7 +1,7 @@
 extends Control 
 
 func _ready():
-
+	$SfxFin.play()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	# 1. Récupérer le nom du gagnant sauvegardé dans Persosglobal
 	var nom_gagnant = Persosglobal.dernier_gagnant_nom
@@ -25,6 +25,7 @@ func _ready():
 	reouvrir_iris()
 # Bouton REVANCHE : Relance le combat avec les MÊMES personnages
 func _on_revanche_pressed():
+	AudioManager.play("clique", global_position)
 	# On peut réinitialiser les scores ici si besoin
 	Persosglobal.score_final_p1 = 0
 	Persosglobal.score_final_p2 = 0
@@ -34,11 +35,12 @@ func _on_revanche_pressed():
 # Bouton NOUVELLE PARTIE : Retourne à la sélection des personnages
 func _on_nouvelleparti_pressed():
 	# On change pour la scène de sélection
+	AudioManager.play("clique", global_position)
 	get_tree().change_scene_to_file("res://script global/champselect.tscn")
 
-# Bouton MENU : Retourne au menu principal du jeu
+
 func _on_menu_pressed():
-	# On change pour ton menu de départ
+	AudioManager.play("clique", global_position)
 	get_tree().change_scene_to_file("res://script global/menu.tscn")
 
 func reouvrir_iris():

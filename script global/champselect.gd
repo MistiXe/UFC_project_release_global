@@ -12,4 +12,5 @@ func _process(delta: float) -> void:
 
 
 func _on_retour_focus_entered() -> void:
+	AudioManager.play("clique", global_position)
 	get_tree().change_scene_to_file("res://script global/menu.tscn")
