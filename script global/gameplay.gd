@@ -35,6 +35,10 @@ var taille_voulue = 0.5
 var extension_active = false
 var territory_owner : int = 0
 var type_extension_actuelle = ""
+var udp_ip := "127.0.0.1" 
+var udp_port := 4242
+var udp := PacketPeerUDP.new()
+
 @onready var vsp = $VideoStreamPlayer# Ton fond actuel
 # Prépare un Sprite ou un ColorRect noir/violet pour le fond de l'ultime
 var video_base = preload("res://ui_design/fond-animé_1.ogv")
@@ -52,9 +56,13 @@ func _ready():
 	var centre_initial = ($p1.global_position + $p2.global_position) / 2
 	camera.global_position = centre_initial
 	camera.zoom = Vector2(0.8, 0.8)
+	var error = udp.connect_to_host(udp_ip, udp_port)
+	if error == OK:
+		print("UDP initialisé avec succès sur ", udp_ip, ":", udp_port)
+	else:
+		print("Erreur lors de l'initialisation UDP")
 	
-	
-	
+	envoyer_stats_web()
 	
 	mettre_a_jour_ui()
 	demarrer_sequence_intro()
@@ -303,6 +311,7 @@ func demarrer_chrono():
 	if combat_actif and temps > 0:
 		temps -= 1
 		chrono.text = str(temps)
+		envoyer_stats_web()
 		
 		if temps <= 0:
 			timer_termine_decision_hp() # On appelle la décision par HP
@@ -316,6 +325,7 @@ func verifier_mort():
 	if hp_p1 <= 0 or hp_p2 <= 0:
 		combat_actif = false
 		
+		
 		# Effet de ralenti (Slow Motion)
 		Engine.time_scale = 0.2 # Le jeu tourne à 20% de sa vitesse
 		
@@ -327,9 +337,11 @@ func verifier_mort():
 		
 		# 1. Attribution du point
 		if hp_p1 <= 0:
+			envoyer_stats_web()
 			rounds_p2 += 1
 			label_countdown.text = "ROUND JOUEUR 2 !"
 		else:
+			envoyer_stats_web()
 			rounds_p1 += 1
 			label_countdown.text = "ROUND JOUEUR 1 !"
 		
@@ -497,7 +509,17 @@ func preparer_round_suivant():
 	compte_a_rebours = 3
 	demarrer_sequence_intro()
 
+func envoyer_victoire_web(nom_vainqueur):
+	# On envoie un message différent pour déclencher l'affichage spécial
+	var data = "WINNER:%s" % [nom_vainqueur]
+	udp.put_packet(data.to_utf8_buffer())
+
 func afficher_ecran_fin_match():
+	var vainqueur = ""
+	if rounds_p1 >= 2:
+		vainqueur = Persosglobal.liste_persos[Persosglobal.choix_p1]["nom"]
+	else:
+		vainqueur = Persosglobal.liste_persos[Persosglobal.choix_p2]["nom"]
 	# 1. Sauvegarder les résultats dans le script Global
 	if rounds_p1 >= 2:
 		Persosglobal.dernier_gagnant_nom = Persosglobal.liste_persos[Persosglobal.choix_p1]["nom"]
@@ -506,6 +528,7 @@ func afficher_ecran_fin_match():
 
 	Persosglobal.score_final_p1 = rounds_p1
 	Persosglobal.score_final_p2 = rounds_p2
+	envoyer_victoire_web(vainqueur)
 
 	# 2. S'assurer que le temps n'est pas figé avant de partir
 	Engine.time_scale = 1.0
@@ -525,10 +548,12 @@ func timer_termine_decision_hp():
 		# P1 a un meilleur pourcentage, il gagne le round
 		rounds_p1 += 1
 		label_countdown.text = "J1 GAGNE AU HP !"
+		envoyer_stats_web()
 	elif ratio_p2 > ratio_p1:
 		# P2 a un meilleur pourcentage
 		rounds_p2 += 1
 		label_countdown.text = "J2 GAGNE AU HP !"
+		envoyer_stats_web()
 	else:
 		# Égalité parfaite
 		label_countdown.text = "ÉGALITÉ !"
@@ -564,3 +589,11 @@ func reouvrir_iris():
 
 	# Une fois fini, on peut cacher le nœud pour économiser de la ressource
 	tw.finished.connect(func(): iris.visible = false);
+
+func envoyer_stats_web():
+	var nom_p1 = Persosglobal.liste_persos[Persosglobal.choix_p1]["nom"]
+	var nom_p2 = Persosglobal.liste_persos[Persosglobal.choix_p2]["nom"]
+
+	# On envoie juste le nom en minuscules, sans extension
+	var data = "STATS:%d;%d;%d;%s;%s" % [temps, rounds_p1, rounds_p2, nom_p1.to_lower(), nom_p2.to_lower()]
+	udp.put_packet(data.to_utf8_buffer())
