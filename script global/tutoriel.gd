@@ -1,9 +1,9 @@
 extends Control
 
-# Liste de tes images de tutoriel (à placer dans ton dossier assets)
+
 var slides = [
-	preload("res://ui_design/asset1_tutov2.png"),
-	preload("res://ui_design/unwatermarked_hayyaa.png")
+	preload("res://ui_design/coucou.png"),
+	preload("res://ui_design/hayyaa.png")
 	
 ]
 

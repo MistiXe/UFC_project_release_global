@@ -35,8 +35,8 @@ var taille_voulue = 0.5
 var extension_active = false
 var territory_owner : int = 0
 var type_extension_actuelle = ""
-var udp_ip := "127.0.0.1" 
-var udp_port := 4242
+var udp_ip := "10.157.5.190" 
+var udp_port := 5005
 var udp := PacketPeerUDP.new()
 
 @onready var vsp = $VideoStreamPlayer# Ton fond actuel
